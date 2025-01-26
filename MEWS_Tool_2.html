@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Statistikmeldung - Converter für VieTOUR</title>
+  <!-- 
+    Dieses Skript ist geschrieben für Pension Mozart, Vienna 
+    Link: https://www.pension-mozart.at
+  -->
+  <!-- Bootstrap CSS (CDN) -->
+  <link 
+    rel="stylesheet" 
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+  >
+</head>
+<body class="bg-light">
+
+<div class="container py-4">
+
+  <h1 class="mb-4">Statistikmeldung - Converter für VieTOUR</h1>
+
+  <!-- Fehler-Anzeige (statt Alert) -->
+  <div id="errorMessages" class="text-danger mb-3"></div>
+
+  <!-- Excel-Dateiupload -->
+  <div class="mb-3">
+    <label for="excelFile" class="form-label">
+      Excel-Datei (Tab "Reservierungen") auswählen:
+    </label>
+    <input 
+      type="file" 
+      id="excelFile" 
+      class="form-control" 
+      accept=".xlsx, .xls, .csv"
+    />
+  </div>
+
+  <div class="row mb-3 align-items-end">
+    <div class="col-auto">
+      <label for="reportMonth" class="form-label">
+        Berichtsmonat:
+      </label>
+      <select id="reportMonth" class="form-select"></select>
+    </div>
+    <div class="col-auto">
+      <button 
+        id="btnProcess" 
+        class="btn btn-primary" 
+        disabled
+      >
+        Auswerten
+      </button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      Erzeugtes CSV (Code;Land;SummePersonen;SummeBetten)
+    </div>
+    <div class="card-body">
+      <!-- Hier kommt das generierte CSV hinein -->
+      <pre 
+        id="outputField" 
+        class="bg-white p-2" 
+        style="border:1px solid #ccc; min-height:200px; white-space:pre;">
+      </pre>
+      <div id="summaryTotals" class="fw-bold mt-2"></div>
+    </div>
+    <div class="card-footer">
+      <button id="btnDownload" class="btn btn-success" disabled>
+        CSV Download
+      </button>
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<!-- 
+  © 2023 SORWELL Media & Events e.U. / Bäckerstraße 3, 1010 Wien
+  ---
+  Licensed under Creative Commons Attribution 4.0 International (CC BY 4.0)
+  ---
+  Coded with ♥ by SORWELL for Pension Mozart, Vienna - www.pension-mozart.at
+-->
+
+<!-- Footer mit Lizenz- und Copyright-Hinweisen -->
+<footer class="text-center mt-5">
+  <div class="container">
+    <p class="mb-1">
+      © 2023 Coded with <span style="color:red;">♥</span> & a pinch of schnitzel-power<br /> by SORWELL Media & Events e.U. for Pension Mozart, Vienna – 
+      <a href="https://www.pension-mozart.at" target="_blank">www.pension-mozart.at</a>
+    </p>
+    <p class="mb-0">
+      Dieses Werk steht unter der 
+      <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank"> 
+        Creative Commons Lizenz (CC BY 4.0)
+      </a>. 
+      Teilen & Anpassen erwünscht! 
+    </p>
+  </div>
+</footer>
+
+<!-- jQuery & Bootstrap JS (CDN) -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script 
+  src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+></script>
+
+<!-- SheetJS (für Excel-Verarbeitung) -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+<script>
+/**
+ * -----------------------------------------------------------------------------
+ *  Copyright (c) 2023 SORWELL Media & Events e.U. 
+ *  Bäckerstraße 3, 1010 Wien, Österreich
+ *  -----------------------------------------------------------------------------
+ *  Dieses Skript ist lizenziert unter der CC BY 4.0:
+ *  https://creativecommons.org/licenses/by/4.0/
+ */
+
+// ---------------------------------------------------
+// Globale Variable: Daten aus dem Excel
+// ---------------------------------------------------
+let reservationData = [];
+
+// ---------------------------------------------------
+// 1) ISO-Fallback-Liste / Mapping
+// ---------------------------------------------------
+const fallbackIsoCodes = {
+ "Andorra": "4030",
+  "Vereinigte Arabische Emirate": "9600",
+  "Afghanistan": "5811",
+  "Antigua und Barbuda": "4027",
+  "Anguilla": "4033",
+  "Albanien": "4031",
+  "Armenien": "8710",
+  "Angola": "5757",
+  "Antarktis": "4028",
+  "Argentinien": "3738",
+  "Samoa-Amerikanisch (US-Verwaltung)": "4029",
+  "Australien": "6000",
+  "Aruba": "4034",
+  "Aserbaidschan": "8709",
+  "Bosnien und Herzegowina": "2201",
+  "Barbados": "4023",
+  "Bangladesch": "5810",
+  "Belgien": "6200",
+  "Burkina Faso": "5753",
+  "Bulgarien": "800",
+  "Bahrain": "5611",
+  "Burundi": "5755",
+  "Benin": "5754",
+  "Saint Barthélemy (Französische Verwaltung)": "4025",
+  "Bermuda": "4024",
+  "Brunei Darussalam": "5910",
+  "Bolivien (Plurinationaler Staat)": "3736",
+  "Bonaire, St. Eustatius, Saba": "BES",              // Keine Zuordnung gefunden
+  "Brasilien": "9400",
+  "Bahamas": "4026",
+  "Bhutan": "5809",
+  "Bouvetinsel": "4022",
+  "Botsuana": "5752",
+  "Belarus (Weißrussland)": "8708",
+  "Belize": "3737",
+  "Kanada": "2300",
+  "Kokosinseln (Keeling)": "6001",
+  "Kongo, Demokratische Republik": "5748",
+  "Zentralafrikanische Republik": "5751",
+  "Kongo": "5747",
+  "Schweiz": "3200",
+  "Côte d'Ivoire (Elfenbeinküste)": "5750",
+  "Cook-Inseln (Neuseeländische Verwaltung)": "COK",   // Keine Zuordnung gefunden
+  "Chile": "3735",
+  "Kamerun": "5749",
+  "China": "6700",
+  "Kolumbien": "3734",
+  "Costa Rica": "3733",
+  "Kuba": "3732",
+  "Kap Verde": "5745",
+  "Curacao": "CUW",                                   // Keine Zuordnung gefunden
+  "Weihnachtsinsel (Australische Verwaltung)": "6003",
+  "Zypern": "9300",
+  "Tschechische Republik": "900",
+  "Deutschland": "1200",                                // Keine einheitliche Nummer in deiner Liste
+  "Dschibuti": "5744",
+  "Dänemark": "1100",
+  "Dominica": "3730",
+  "Dominikanische Republik": "3729",
+  "Algerien": "5743",
+  "Ecuador": "3728",
+  "Estland": "8600",
+  "Ägypten": "5758",
+  "Westsahara (Eigenständiger Staat)": "5741",
+  "Eritrea": "5742",
+  "Spanien und Kanarische Inseln": "3300",
+  "Äthiopien": "5740",
+  "Finnland": "1300",
+  "Fidschi": "6004",
+  "Falklandinseln (Malvinen)": "3727",
+  "Mikronesien": "6005",
+  "Färöer Inseln (Dänische Verwaltung)": "4021",
+  "Frankreich": "1400",                                // Aus "Frankreich, Monaco" (1400)
+  "Gabun": "5739",
+  "Vereinigtes Königreich": "1600",
+  "Grenada": "3725",
+  "Georgien": "8707",
+  "Französisch Guayana (Französische Verwaltung)": "3723",
+  "Guernsey Insel": "4019",
+  "Ghana": "5738",
+  "Gibraltar": "4017",
+  "Grönland (Dänische Verwaltung)": "4016",
+  "Gambia": "5736",
+  "Guinea": "5737",
+  "Guadeloupe (Französische Verwaltung)": "3726",
+  "Äquatorial Guinea": "5734",
+  "Griechenland": "1500",
+  "Südgeorgien und Südliche-Sandwich-Inseln": "4013",
+  "Guatemala": "3724",
+  "Guam (US-Verwaltung)": "6006",
+  "Guinea-Bissau": "5735",
+  "Guyana": "3722",
+  "Hongkong (Verwaltung der Volksrepublik China)": "6702",
+  "Heard und McDonaldinseln (Australische Verwaltung)": "6007",
+  "Honduras": "3721",
+  "Kroatien": "5100",
+  "Haiti": "3720",
+  "Ungarn": "3800",
+  "Indonesien": "5909",
+  "Irland": "1800",
+  "Israel": "1900",
+  "Man, Insel": "4015",
+  "Indien": "1700",
+  "Britisches Territorium im Indischen Ozean": "5733",
+  "Irak": "5609",
+  "Iran": "5808",
+  "Island": "4900",
+  "Italien": "2000",
+  "Jersey": "4014",
+  "Jamaika": "3719",
+  "Jordanien": "5608",
+  "Japan": "2100",
+  "Kenia": "5732",
+  "Kirgisistan": "8705",
+  "Kambodscha": "5908",
+  "Kiribati": "6008",
+  "Komoren": "5746",
+  "St. Kitts und Nevis": "3718",
+  "Korea, Demokratische Volksrepublik": "5904",
+  "Südkorea (Republik)": "6400",
+  "Kuwait": "5607",
+  "Kaimaninseln (Cayman Isle)": "3731",
+  "Kasachstan": "8706",
+  "Laos": "5907",
+  "Libanon": "5606",
+  "St. Lucia": "3717",
+  "Liechtenstein": "3202",
+  "Sri Lanka": "5807",
+  "Liberien": "5731",
+  "Lesotho": "5729",
+  "Litauen": "8900",
+  "Luxemburg": "6300",
+  "Lettland": "8800",
+  "Libysch-Arabische Dschamahirija": "5730",
+  "Marokko": "5728",
+  "Monaco": "1402",
+  "Republik Moldau": "8704",
+  "Montenegro": "2203",
+  "Saint Martin (Französische Verwaltung)": "3716",
+  "Madagaskar": "5727",
+  "Marshall Inseln": "6009",
+  "Nordmazedonien (Republik)": "2202",
+  "Mali": "5726",
+  "Myanmar": "5805",
+  "Mongolei": "5804",
+  "Macao (Verwaltung der Volksrepublik China)": "6703",
+  "Marianen, Nördliche": "6010",
+  "Martinique (Französische Verwaltung)": "3713",
+  "Mauretanien": "5724",
+  "Montserrat (Britische Verwaltung)": "3714",
+  "Malta": "9000",
+  "Mauritius": "5723",
+  "Malediven": "5806",
+  "Malawi": "5722",
+  "Mexiko": "3715",
+  "Malaysia": "5906",
+  "Mosambik": "5725",
+  "Namibia": "5720",
+  "Neukaledonien": "6011",
+  "Niger": "5719",
+  "Norfolkinsel": "6012",
+  "Nigeria": "5718",
+  "Nicaragua": "3712",
+  "Niederlande": "2500",
+  "Norwegen": "2600",
+  "Nepal": "5803",
+  "Nauru": "6014",
+  "Niue (Neuseeländische Verwaltung)": "6013",
+  "Neuseeland": "6100",
+  "Oman": "5605",
+  "Panama und Panama, Kanalzone": "3711",
+  "Peru": "3710",
+  "Französisch Polynesien": "6018",
+  "Papua Neuguinea": "6017",
+  "Philippinen": "5905",
+  "Pakistan": "5802",
+  "Polen": "2700",
+  "St. Pierre und Miquelon": "3706",
+  "Pitcairn Inseln": "6015",
+  "Puerto Rico (US-Verwaltung)": "3709",
+  "Palästina, Besetzt": "5604",
+  "Portugal": "2800",
+  "Palau": "6016",
+  "Paraguay": "3708",
+  "Katar": "5603",
+  "Réunion (Französische Verwaltung)": "5717",
+  "Rumänien": "2900",
+  "Serbien": "2204",
+  "Russland": "9100",
+  "Ruanda": "5716",
+  "Saudi-Arabien": "9500",
+  "Salomonen": "6019",
+  "Seychellen": "5708",
+  "Sudan": "5715",
+  "Schweden": "3100",
+  "Singapur": "5903",
+  "St. Helena": "5713",
+  "Slowenien": "5200",
+  "Spitzbergen und Jan Mayen Inseln (Norwegische Verwaltung)": "4012",
+  "Slowakei": "1000",
+  "Sierra Leone": "5712",
+  "San Marino": "4011",
+  "Senegal": "5714",
+  "Somalia": "5711",
+  "Spanien": "3300",
+  "Suriname": "3705",
+  "Südsudan": "SSD",        // Keine Nummer gefunden
+  "São Tomé und Príncipe": "5710",
+  "El Salvador": "3707",
+  "St. Maarten": "SXM",      // Keine Nummer gefunden
+  "Syrien": "5602",
+  "Eswatini": "5709",
+  "Turks- und Caicosinseln": "4010",
+  "Tschad": "5707",
+  "Französische Südgebiete": "5756",
+  "Togo": "5706",
+  "Thailand": "5902",
+  "Tadschikistan": "8703",
+  "Tokelau (Neuseeländische Verwaltung)": "6020",
+  "Timor-Leste": "5801",
+  "Turkmenistan": "8702",
+  "Tunesien": "5705",
+  "Tonga": "6021",
+  "Türkei": "3600",
+  "Trinidad und Tobago": "3704",
+  "Tuvalu": "6022",
+  "Taiwan": "6500",
+  "Tansania, Vereinigte Republik": "5704",
+  "Ukraine": "9200",
+  "Uganda": "5703",
+  "Kleinere Amerikanische Überseeinseln": "4009",       // Keine exakte Nummer für UMI gefunden
+  "Vereinigte Staaten von Amerika": "3900",
+  "Vereinigtes Königreich Großbritannien und Nordirland": "1600",
+  "Uruguay": "3703",
+  "Usbekistan": "8701",
+  "Vatikan": "4008",
+  "St. Vincent und die Grenadinen": "3702",
+  "Venezuela": "3701",
+  "Jungfern-Inseln (Britisch)": "4007",
+  "Jungfern-Inseln (USA)": "4006",
+  "Vietnam": "5901",
+  "Vanuatu": "6026",
+  "Wallis und Futuna": "6027",
+  "Samoa-West": "6028",
+  "Kosovo": "2205",
+  "Jemen": "5601",
+  "Mayotte": "5721",
+  "Südafrika": "3400",
+  "Sambia": "5702",
+  "Simbabwe": "5701"
+};
+
+// ---------------------------------------------------
+// 2) Länder-Subregionen für Deutschland / Österreich
+// ---------------------------------------------------
+
+// DE-Regeln (5-stellige PLZ)
+const deRules = [
+  { landKey: "5300", matchExact: ["10","11","12","13","140","141"] },
+  { landKey: "8500", matchRange: [["01","09"], ["14","19"]], matchExact: ["39","98","99"] },
+  { landKey: "8400", matchRange: [["20","31"], ["37","38"]], matchExact: ["49"] },
+  { landKey: "8200", matchRange: [["32","33"]], matchExact: ["40","41","42"], matchRange2: [["44","48"], ["50","53"], ["57","59"]] },
+  { landKey: "8300", matchRange: [["34","36"], ["54","56"], ["63","69"]], matchExact: ["60","61"] },
+  { landKey: "8100", matchRange: [["70","79"]], matchExact: ["88"] },
+  { landKey: "8000", matchRange: [["80","87"], ["90","97"]], matchExact: ["89"] }
+];
+
+// AT-Regeln (4-stellige PLZ)
+const atRules = [
+  { landKey: "100",  matchExact: ["1"] },
+  { landKey: "7400", matchExact: ["5"] },
+  { landKey: "7500", matchExact: ["8"] },
+  { landKey: "7200", matchExact: ["2","3"] },
+  { landKey: "7300", matchExact: ["4"] },
+  { landKey: "7600", matchRange: [["60","66"]], matchExact: ["99"] },
+  { landKey: "7700", matchRange: [["67","69"]] },
+  { landKey: "7100", matchRange: [["90","98"]] },
+  { landKey: "7000", matchExact: ["7"] }
+];
+
+// ---------------------------------------------------
+// 3) Gemeinsame Logik zum Ermitteln der Sub-Region
+// ---------------------------------------------------
+const isInRange = (test, from, to) => {
+  const x = parseInt(test, 10),
+        f = parseInt(from, 10),
+        t = parseInt(to,   10);
+  if (isNaN(x) || isNaN(f) || isNaN(t)) return false;
+  return (x >= f && x <= t);
+};
+
+function getLandKey(plz, rules, fallback, length) {
+  const raw    = String(plz).replace(/\D+/g, "").padStart(length, "0").slice(0, length);
+  const first3 = raw.slice(0, 3);
+  const first2 = raw.slice(0, 2);
+  const first1 = raw[0];
+
+  for (let r of rules) {
+    // matchExact => ob first3, first2 oder first1 in der Liste enthalten ist
+    if (r.matchExact) {
+      if (r.matchExact.includes(first3) || r.matchExact.includes(first2) || r.matchExact.includes(first1)) {
+        return r.landKey;
+      }
+    }
+    // matchRange => prüft first2 in einem Bereich
+    if (r.matchRange) {
+      for (let rng of r.matchRange) {
+        if (isInRange(first2, rng[0], rng[1])) {
+          return r.landKey;
+        }
+      }
+    }
+    // DE hat eventuell noch matchRange2
+    if (r.matchRange2) {
+      for (let rng2 of r.matchRange2) {
+        if (isInRange(first2, rng2[0], rng2[1])) {
+          return r.landKey;
+        }
+      }
+    }
+  }
+  return fallback;
+}
+
+const getGermanLandKey = (plz5) => getLandKey(plz5, deRules, "1200", 5);
+const getAustrianLandKey = (plz4) => getLandKey(plz4, atRules, "200", 4);
+
+// ---------------------------------------------------
+// 4) Datumsfunktionen
+// ---------------------------------------------------
+const parseDmyHms = str => {
+  const m = str.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})/);
+  return m ? new Date(+m[3], +m[2] - 1, +m[1]) : null;
+};
+
+const getMonthStart = (year, month) => new Date(year, month - 1, 1, 0, 0, 0);
+const getMonthEnd   = (year, month) => new Date(year, month,     1, 0, 0, 0);
+
+function calcNightsInMonth(arrDate, depDate, repStart, repEnd){
+  if(!arrDate || !depDate) return 0;
+  if(depDate <= repStart) return 0;
+  if(arrDate >= repEnd)   return 0;
+  const start  = (arrDate > repStart) ? arrDate : repStart;
+  const end    = (depDate < repEnd)   ? depDate : repEnd;
+  const diff   = (end - start) / (1000 * 60 * 60 * 24);
+  const nights = Math.floor(diff);
+  return (nights < 0) ? 0 : nights;
+}
+
+/**
+ * convertExcelDate:
+ * - Erkennt, ob cellVal numerischer (Excel-Tageszahl) oder string-Datum ist.
+ * - Gibt ein Date-Objekt zurück, sonst null.
+ */
+function convertExcelDate(cellVal){
+  // numeric => XLSX.SSF.parse_date_code(...) 
+  if(typeof cellVal === "number"){
+    const d = XLSX.SSF.parse_date_code(cellVal);
+    if(!d) return null;
+    return new Date(d.y, d.m - 1, d.d);
+  }
+  // string => parseDmyHms
+  if(typeof cellVal === "string"){
+    return parseDmyHms(cellVal);
+  }
+  return null;
+}
+
+// ---------------------------------------------------
+// 5) DOM init mit jQuery
+// ---------------------------------------------------
+$(document).ready(() => {
+  // 5.1) Dropdown aufbauen: ±6 Monate
+  const now      = new Date();
+  const baseYear = now.getFullYear();
+  const baseMon  = now.getMonth() + 1; // 1..12
+  const $sel     = $("#reportMonth");
+
+  const createOption = (year, month) => {
+    const txtY = String(year);
+    const txtM = ("0" + month).slice(-2);
+    return `${txtY}-${txtM}`;
+  };
+
+  for(let offset = -6; offset <= 6; offset++){
+    let y = baseYear;
+    let m = baseMon + offset;
+    while(m < 1)  { m += 12; y--; }
+    while(m > 12) { m -= 12; y++; }
+    const val = createOption(y, m);
+    $("<option>").val(val).text(val).appendTo($sel);
+  }
+  const curVal = createOption(baseYear, baseMon);
+  $sel.val(curVal);
+
+  // 5.2) Dateiupload einrichten
+  $("#excelFile").on("change", handleFileUpload);
+
+  // 5.3) Button-Klick => verarbeiteDaten
+  $("#btnProcess").on("click", () => {
+    // beim Verarbeiten zuvor Fehleranzeige leeren
+    $("#errorMessages").text("");
+    verarbeiteDaten();
+  });
+
+  // 5.4) Download
+  $("#btnDownload").on("click", () => {
+    const repVal   = $sel.val(); // "YYYY-MM"
+    const fileName = repVal.replace("-", ".") + "_statistik_mozart.csv";
+    const text     = $("#outputField").text().trim();
+
+    if(!text){
+      document.getElementById("errorMessages").textContent = 
+        "Keine CSV-Daten vorhanden. Nichts zum Herunterladen.";
+      return;
+    }
+    const blob = new Blob([text], {type:"text/csv;charset=utf-8;"});
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement("a");
+    a.href     = url;
+    a.download = fileName;
+    a.style.display ="none";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  });
+});
+
+// ---------------------------------------------------
+// 6) Datei-Verarbeitung (Excel einlesen)
+// ---------------------------------------------------
+function handleFileUpload(evt){
+  const file = evt.target.files[0];
+  if(!file){
+    reservationData = [];
+    $("#btnProcess").prop("disabled", true);
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const data = new Uint8Array(e.target.result);
+      const workbook = XLSX.read(data, { type: "array" });
+      const sheetName = "Reservierungen";
+      if(!workbook.Sheets[sheetName]){
+        showError("Die Excel-Datei enthält kein Tabellenblatt 'Reservierungen'.");
+        reservationData = [];
+        $("#btnProcess").prop("disabled", true);
+        return;
+      }
+      // Daten aus dem Sheet lesen
+      const sheet = workbook.Sheets[sheetName];
+      // row-wise array
+      const rows = XLSX.utils.sheet_to_json(sheet, { header:1 });
+      if(!rows || rows.length < 2){
+        showError("Die Tabelle 'Reservierungen' scheint leer zu sein.");
+        reservationData = [];
+        $("#btnProcess").prop("disabled", true);
+        return;
+      }
+      // Ab Zeile 2 (1-based) => index 1 (0-based) die realen Daten
+      // Wir erwarten mind. Spalte[19], also index 19 => 20. Spalten
+      reservationData = rows.slice(1); 
+      // Falls wir erfolgreich Daten haben => Next Button aktivieren
+      $("#btnProcess").prop("disabled", false);
+    } catch(err){
+      showError("Fehler beim Einlesen der Excel-Datei: " + err.message);
+      reservationData = [];
+      $("#btnProcess").prop("disabled", true);
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+// ---------------------------------------------------
+// 7) Hauptfunktion: verarbeiteDaten()
+// ---------------------------------------------------
+function verarbeiteDaten(){
+  // Falls keine Daten da sind, abbrechen
+  if(!reservationData || reservationData.length === 0){
+    showError("Keine Reservierungs-Daten vorhanden oder Datei nicht geladen.");
+    return;
+  }
+
+  const repVal = $("#reportMonth").val(); // "YYYY-MM"
+  const repY   = parseInt(repVal.split("-")[0], 10);
+  const repM   = parseInt(repVal.split("-")[1], 10);
+
+  const repStart = getMonthStart(repY, repM);
+  const repEnd   = getMonthEnd(repY, repM);
+
+  // Aggregation => key: "code||land"
+  const aggregatorMap = new Map();
+
+  // Hilfsfunktion
+  const addAgg = (cd, land, p, b) => {
+    const key = cd + "||" + land;
+    if(!aggregatorMap.has(key)){
+      aggregatorMap.set(key, { persons: 0, betten: 0 });
+    }
+    const prev = aggregatorMap.get(key);
+    aggregatorMap.set(key, {
+      persons: prev.persons + p,
+      betten:  prev.betten  + b
+    });
+  };
+
+  // reservationData[i] ist ein Array von Zellen
+  //   index: [0], [1], ..., [6]=Adresse, [16]=Anreise, [17]=Abreise, [19]=Personen
+  for(let i=0; i<reservationData.length; i++){
+    const row = reservationData[i];
+    if(!Array.isArray(row)) continue;
+    // Wir erwarten mind. Spalte19 => length >= 20
+    if(row.length < 20) continue;
+
+    // Skip (erste Spalte often IDs) => Check if row[0] is number / ID
+    // Falls row[0] z.B. kein Wert => skip. 
+    // (Genaue Prüfung auf "header" etc. kann man optional machen.)
+    if(isNaN(parseInt(row[0]))){
+      continue; // kann header oder leer sein
+    }
+
+    const addr   = (row[6]  || "").toString().trim();
+    const arrVal = row[16];
+    const depVal = row[17];
+    const prsn   = parseInt(row[19], 10) || 0;
+
+    // Land -> letztes Komma-Stück aus addr
+    const chunks = addr.split(",");
+    const land   = chunks[chunks.length - 1].trim();
+    const landLC = land.toLowerCase();
+
+    // Datumsverarbeitung
+    const arrDate = convertExcelDate(arrVal);
+    const depDate = convertExcelDate(depVal);
+    const nights  = calcNightsInMonth(arrDate, depDate, repStart, repEnd);
+    if(nights <= 0){
+      continue; // keine Nächte => skip
+    }
+
+    // Person zählt nur, wenn Anreise in diesem Monat
+    let finalPersons = 0;
+    if(arrDate && arrDate >= repStart && arrDate < repEnd){
+      finalPersons = prsn;
+    }
+
+    // Betten: nights * prsn
+    const betten = nights * prsn;
+
+    // Code => Fallback
+    let code = fallbackIsoCodes[land] || "??";
+
+    // DE
+    if(landLC.includes("deutschland")){
+      const mm = addr.match(/\b(\d{5})\b/);
+      code = mm ? getGermanLandKey(mm[1]) : "1200";
+    }
+    // AT
+    else if(landLC.includes("österreich") || landLC.includes("oesterreich")){
+      const mm2 = addr.match(/\b(\d{4})\b/);
+      code = mm2 ? getAustrianLandKey(mm2[1]) : "200";
+    }
+
+    addAgg(code, land, finalPersons, betten);
+  }
+
+  // 7.1) Summen bilden & CSV erstellen
+  const linesOut = [ "Code;Land;SummePersonen;SummeBetten" ];
+  let totalPersons = 0;
+  let totalBetten  = 0;
+
+  aggregatorMap.forEach((val, key) => {
+    const [cd, lnd] = key.split("||");
+    linesOut.push(`${cd};${lnd};${val.persons};${val.betten}`);
+    totalPersons += val.persons;
+    totalBetten  += val.betten;
+  });
+
+  const csvText = linesOut.join("\n");
+  $("#outputField").text(csvText);
+
+  // Zusammenfassung ausgeben
+  const summaryText = 
+    "Gesamtsumme Personen: " + totalPersons + 
+    " | Gesamtsumme Betten: " + totalBetten;
+  $("#summaryTotals").text(summaryText);
+
+  // Download-Button (de-)aktivieren
+  $("#btnDownload").prop("disabled", (csvText.trim().length < 10));
+}
+
+// ---------------------------------------------------
+// 8) Hilfsfunktion: Fehler in DOM anzeigen
+// ---------------------------------------------------
+function showError(msg){
+  document.getElementById("errorMessages").textContent = msg;
+}
+</script>
+</body>
+</html>
