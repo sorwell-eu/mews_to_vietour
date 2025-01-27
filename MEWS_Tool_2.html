@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -546,7 +547,7 @@ function convertExcelDate(cellVal){
 // 5) DOM init mit jQuery
 // ---------------------------------------------------
 $(document).ready(() => {
-  // 5.1) Dropdown aufbauen: ±6 Monate
+  // 5.1) Dropdown aufbauen
   const now      = new Date();
   const baseYear = now.getFullYear();
   const baseMon  = now.getMonth() + 1; // 1..12
@@ -566,8 +567,16 @@ $(document).ready(() => {
     const val = createOption(y, m);
     $("<option>").val(val).text(val).appendTo($sel);
   }
-  const curVal = createOption(baseYear, baseMon);
-  $sel.val(curVal);
+  
+  let defY = baseYear;
+  let defM = baseMon - 1;
+  if (defM < 1) {
+    defM += 12;
+    defY--;
+  }
+
+  const prevMonVal = createOption(defY, defM);
+  $sel.val(prevMonVal);
 
   // 5.2) Dateiupload einrichten
   $("#excelFile").on("change", handleFileUpload);
