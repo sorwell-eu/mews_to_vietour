@@ -561,7 +561,7 @@ $(document).ready(() => {
     return `${txtY}-${txtM}`;
   };
 
-  for(let offset = -6; offset <= 6; offset++){
+  for(let offset = -12; offset <= 1; offset++){
     let y = baseYear;
     let m = baseMon + offset;
     while(m < 1)  { m += 12; y--; }
