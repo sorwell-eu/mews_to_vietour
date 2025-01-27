@@ -84,18 +84,70 @@
 -->
 
 <!-- Footer mit Lizenz- und Copyright-Hinweisen -->
-<footer class="text-center mt-5">
+<footer class="text-center mt-5 mb-3">
   <div class="container">
-    <p class="mb-1">
-      © 2023 Coded with <span style="color:red;">♥</span> & a pinch of schnitzel-power<br /> by SORWELL Media & Events e.U. for Pension Mozart, Vienna – 
-      <a href="https://www.pension-mozart.at" target="_blank">www.pension-mozart.at</a>
+    <p class="mb-1 text-muted small">
+      coded with <span class="text-danger">♥</span> &amp; a pinch of schnitzel-power by
+      <a 
+        href="https://www.sorwell.eu" 
+        target="_blank" 
+        rel="noopener noreferrer" 
+        class="text-decoration-none text-secondary"
+        aria-label="Visit Sorwell Media"
+      >
+        <svg 
+          width="50" 
+          height="15" 
+          viewBox="0 0 59.1 18" 
+          xmlns="http://www.w3.org/2000/svg" 
+          aria-hidden="true"
+          focusable="false"
+          class="align-text-bottom"
+        >
+          <style>.st0 { fill: #000; }</style>
+          <g>
+            <path class="st0" d="M6.3,5.8C5.6,5.2,4.9,5,4,5C2.9,5,2.1,5.4,2.1,6.1c0,0.7,0.8,1,1.9,1.1C5.7,7.3,7.8,7.7,7.8,10
+              c0,1.6-1.5,2.8-3.7,2.8c-1.4,0-2.9-0.3-4-1.6l1-1.3c0.8,0.9,2.1,1.3,3.1,1.3c0.9,0,1.9-0.3,1.9-1.1c0-0.8-0.7-1.1-2-1.2
+              C2.2,8.6,0.3,8.1,0.3,6.1c0-1.9,2-2.7,3.7-2.7c1.4,0,2.4,0.3,3.4,1.2L6.3,5.8z"/>
+            <path class="st0" d="M18.1,8.1c0,2.6-1.8,4.6-4.6,4.6c-2.7,0-4.5-2-4.5-4.6c0-2.6,1.8-4.6,4.5-4.6C16.2,3.5,18.1,5.5,18.1,8.1z
+              M10.8,8.1c0,1.6,1,2.9,2.7,2.9c1.7,0,2.7-1.3,2.7-2.9c0-1.6-1.1-2.9-2.7-2.9C11.8,5.2,10.8,6.5,10.8,8.1z"/>
+            <path class="st0" d="M21.6,3.7l0.1,1.2c0.6-1.1,1.6-1.4,2.6-1.4c0.9,0,1.7,0.3,2.2,0.7l-0.8,1.6c-0.4-0.4-0.9-0.5-1.6-0.5
+              c-1.3,0-2.4,0.8-2.4,2.4v4.8h-1.8V3.7H21.6z"/>
+            <path class="st0" d="M35.2,3.7l2.1,6.9l2.2-6.9h2.1l-3.1,8.9h-2.1l-1-2.9l-0.9-3.1l-0.9,3.1l-1,2.9h-2.1l-3.1-8.9h2.1l2.2,6.9
+              l2.1-6.9H35.2z"/>
+            <path class="st0" d="M44.1,8.8c0.2,1.3,1.3,2.2,2.9,2.2c0.9,0,2-0.3,2.6-0.9l1.2,1.2c-0.9,1-2.4,1.5-3.8,1.5
+              c-2.9,0-4.7-1.8-4.7-4.7c0-2.7,1.9-4.6,4.6-4.6c2.8,0,4.8,1.7,4.4,5.3H44.1z M49.5,7.2c-0.1-1.4-1.1-2.1-2.6-2.1
+              c-1.3,0-2.4,0.7-2.7,2.1H49.5z"/>
+            <path class="st0" d="M54.9,0v12.5H53V0H54.9z"/>
+            <path class="st0" d="M59.1,0v12.5h-1.8V0H59.1z"/>
+          </g>
+        </svg>
+        <!-- Optional: <span class="visually-hidden">Sorwell Media</span> if needed. -->
+      </a>
+      <br/>
+      for Pension Mozart, Vienna –
+      <a 
+        href="https://www.pension-mozart.at" 
+        target="_blank" 
+        rel="noopener noreferrer" 
+        class="text-decoration-none text-secondary"
+      >
+        www.pension-mozart.at
+      </a>
     </p>
-    <p class="mb-0">
-      Dieses Werk steht unter der 
+    <hr class="mx-auto my-2" style="width: 40px; border-top: 1px solid;" />
+    <p class="mb-0 text-muted small text-center">
+      Dieses Werk steht unter der
+      <a 
+        href="https://www.gnu.org/licenses/agpl-3.0.html" 
+        target="_blank" 
+        rel="noopener noreferrer" 
+        class="text-decoration-none text-secondary"
+      >
         GNU Affero General Public License (AGPL) v3.0
-      </a>. 
-      Teilen & Anpassen erwünscht! 
+      </a>.
     </p>
+    <small class="text-muted small">© 2023 – 2025 sorwell media e.u.</small>
   </div>
 </footer>
 
@@ -126,7 +178,7 @@ let reservationData = [];
 // 1) ISO-Fallback-Liste / Mapping
 // ---------------------------------------------------
 const fallbackIsoCodes = {
- "Andorra": "4030",
+  "Andorra": "4030",
   "Vereinigte Arabische Emirate": "9600",
   "Afghanistan": "5811",
   "Antigua und Barbuda": "4027",
@@ -136,7 +188,7 @@ const fallbackIsoCodes = {
   "Angola": "5757",
   "Antarktis": "4028",
   "Argentinien": "3738",
-  "Samoa-Amerikanisch (US-Verwaltung)": "4029",
+  "Amerikanisch-Samoa": "4029", // Korrigiert von "Samoa-Amerikanisch (US-Verwaltung)"
   "Australien": "6000",
   "Aruba": "4034",
   "Aserbaidschan": "8709",
@@ -153,7 +205,7 @@ const fallbackIsoCodes = {
   "Bermuda": "4024",
   "Brunei Darussalam": "5910",
   "Bolivien (Plurinationaler Staat)": "3736",
-  "Bonaire, St. Eustatius, Saba": "BES",              // Keine Zuordnung gefunden
+  "Bonaire, Sint Eustatius und Saba": "BES", // Korrigiert von "Bonaire, St. Eustatius, Saba"
   "Brasilien": "9400",
   "Bahamas": "4026",
   "Bhutan": "5809",
@@ -162,25 +214,25 @@ const fallbackIsoCodes = {
   "Belarus (Weißrussland)": "8708",
   "Belize": "3737",
   "Kanada": "2300",
-  "Kokosinseln (Keeling)": "6001",
+  "Kokosinseln/Keelinginseln": "6001", // Korrigiert von "Kokosinseln (Keeling)"
   "Kongo, Demokratische Republik": "5748",
   "Zentralafrikanische Republik": "5751",
   "Kongo": "5747",
   "Schweiz": "3200",
-  "Côte d'Ivoire (Elfenbeinküste)": "5750",
-  "Cook-Inseln (Neuseeländische Verwaltung)": "COK",   // Keine Zuordnung gefunden
+  "Elfenbeinküste": "5750", // Korrigiert von "Côte d'Ivoire (Elfenbeinküste)"
+  "Cookinseln": "COK", // Korrigiert von "Cook-Inseln (Neuseeländische Verwaltung)"
   "Chile": "3735",
   "Kamerun": "5749",
   "China": "6700",
   "Kolumbien": "3734",
   "Costa Rica": "3733",
   "Kuba": "3732",
-  "Kap Verde": "5745",
-  "Curacao": "CUW",                                   // Keine Zuordnung gefunden
-  "Weihnachtsinsel (Australische Verwaltung)": "6003",
+  "Cabo Verde": "5745", // Korrigiert von "Kap Verde"
+  "Curacao": "CUW", // Keine Änderung erforderlich
+  "Weihnachtsinsel": "6003", // Korrigiert von "Weihnachtsinsel (Australische Verwaltung)"
   "Zypern": "9300",
   "Tschechische Republik": "900",
-  "Deutschland": "1200",                                // Keine einheitliche Nummer in deiner Liste
+  "Deutschland": "1200", // Keine einheitliche Nummer in deiner Liste
   "Dschibuti": "5744",
   "Dänemark": "1100",
   "Dominica": "3730",
@@ -189,37 +241,37 @@ const fallbackIsoCodes = {
   "Ecuador": "3728",
   "Estland": "8600",
   "Ägypten": "5758",
-  "Westsahara (Eigenständiger Staat)": "5741",
+  "Westsahara": "5741", // Korrigiert von "Westsahara (Eigenständiger Staat)"
   "Eritrea": "5742",
-  "Spanien und Kanarische Inseln": "3300",
+  "Spanien": "3300", // Korrigiert von "Spanien und Kanarische Inseln"
   "Äthiopien": "5740",
   "Finnland": "1300",
   "Fidschi": "6004",
   "Falklandinseln (Malvinen)": "3727",
   "Mikronesien": "6005",
-  "Färöer Inseln (Dänische Verwaltung)": "4021",
-  "Frankreich": "1400",                                // Aus "Frankreich, Monaco" (1400)
+  "Färöer": "4021", // Korrigiert von "Färöer Inseln (Dänische Verwaltung)"
+  "Frankreich": "1400", // Aus "Frankreich, Monaco" (1400)
   "Gabun": "5739",
-  "Vereinigtes Königreich": "1600",
+  "Vereinigtes Königreich Großbritannien und Nordirland": "1600", // Korrigiert von "Vereinigtes Königreich"
   "Grenada": "3725",
   "Georgien": "8707",
-  "Französisch Guayana (Französische Verwaltung)": "3723",
-  "Guernsey Insel": "4019",
+  "Französisch-Guayana": "3723", // Korrigiert von "Französisch Guayana (Französische Verwaltung)"
+  "Guernsey": "4019", // Korrigiert von "Guernsey Insel"
   "Ghana": "5738",
   "Gibraltar": "4017",
-  "Grönland (Dänische Verwaltung)": "4016",
+  "Grönland": "4016", // Korrigiert von "Grönland (Dänische Verwaltung)"
   "Gambia": "5736",
   "Guinea": "5737",
-  "Guadeloupe (Französische Verwaltung)": "3726",
-  "Äquatorial Guinea": "5734",
+  "Guadeloupe": "3726", // Korrigiert von "Guadeloupe (Französische Verwaltung)"
+  "Äquatorialguinea": "5734", // Korrigiert von "Äquatorial Guinea"
   "Griechenland": "1500",
-  "Südgeorgien und Südliche-Sandwich-Inseln": "4013",
+  "Südgeorgien und die Südlichen Sandwichinseln": "4013", // Korrigiert von "Südgeorgien und Südliche-Sandwich-Inseln"
   "Guatemala": "3724",
-  "Guam (US-Verwaltung)": "6006",
+  "Guam": "6006", // Korrigiert von "Guam (US-Verwaltung)"
   "Guinea-Bissau": "5735",
   "Guyana": "3722",
-  "Hongkong (Verwaltung der Volksrepublik China)": "6702",
-  "Heard und McDonaldinseln (Australische Verwaltung)": "6007",
+  "Hongkong": "6702", // Korrigiert von "Hongkong (Verwaltung der Volksrepublik China)"
+  "Heard und McDonaldinseln": "6007", // Korrigiert von "Heard und McDonaldinseln (Australische Verwaltung)"
   "Honduras": "3721",
   "Kroatien": "5100",
   "Haiti": "3720",
@@ -227,11 +279,11 @@ const fallbackIsoCodes = {
   "Indonesien": "5909",
   "Irland": "1800",
   "Israel": "1900",
-  "Man, Insel": "4015",
+  "Isle of Man": "4015", // Korrigiert von "Man, Insel"
   "Indien": "1700",
   "Britisches Territorium im Indischen Ozean": "5733",
   "Irak": "5609",
-  "Iran": "5808",
+  "Iran (Islamische Republik)": "5808", // Korrigiert von "Iran"
   "Island": "4900",
   "Italien": "2000",
   "Jersey": "4014",
@@ -244,38 +296,38 @@ const fallbackIsoCodes = {
   "Kiribati": "6008",
   "Komoren": "5746",
   "St. Kitts und Nevis": "3718",
-  "Korea, Demokratische Volksrepublik": "5904",
-  "Südkorea (Republik)": "6400",
+  "Nordkorea (Demokratische Volksrepublik)": "5904", // Korrigiert von "Korea, Demokratische Volksrepublik"
+  "Südkorea": "6400", // Korrigiert von "Südkorea (Republik)"
   "Kuwait": "5607",
-  "Kaimaninseln (Cayman Isle)": "3731",
+  "Kaimaninseln": "3731", // Korrigiert von "Kaimaninseln (Cayman Isle)"
   "Kasachstan": "8706",
-  "Laos": "5907",
+  "Laos (Demokratische Volksrepublik)": "5907", // Korrigiert von "Laos"
   "Libanon": "5606",
   "St. Lucia": "3717",
   "Liechtenstein": "3202",
   "Sri Lanka": "5807",
-  "Liberien": "5731",
+  "Liberia": "5731", // Korrigiert von "Liberien"
   "Lesotho": "5729",
   "Litauen": "8900",
   "Luxemburg": "6300",
   "Lettland": "8800",
-  "Libysch-Arabische Dschamahirija": "5730",
+  "Libyen": "5730", // Korrigiert von "Libysch-Arabische Dschamahirija"
   "Marokko": "5728",
   "Monaco": "1402",
   "Republik Moldau": "8704",
   "Montenegro": "2203",
-  "Saint Martin (Französische Verwaltung)": "3716",
+  "Saint-Martin (französischer Teil)": "3716", // Korrigiert von "Saint Martin (Französische Verwaltung)"
   "Madagaskar": "5727",
-  "Marshall Inseln": "6009",
+  "Marshallinseln": "6009", // Korrigiert von "Marshall Inseln"
   "Nordmazedonien (Republik)": "2202",
   "Mali": "5726",
   "Myanmar": "5805",
   "Mongolei": "5804",
-  "Macao (Verwaltung der Volksrepublik China)": "6703",
-  "Marianen, Nördliche": "6010",
-  "Martinique (Französische Verwaltung)": "3713",
+  "Macao": "6703", // Korrigiert von "Macao (Verwaltung der Volksrepublik China)"
+  "Nördliche Marianen": "6010", // Korrigiert von "Marianen, Nördliche"
+  "Martinique": "3713", // Korrigiert von "Martinique (Französische Verwaltung)"
   "Mauretanien": "5724",
-  "Montserrat (Britische Verwaltung)": "3714",
+  "Montserrat": "3714", // Korrigiert von "Montserrat (Britische Verwaltung)"
   "Malta": "9000",
   "Mauritius": "5723",
   "Malediven": "5806",
@@ -293,25 +345,25 @@ const fallbackIsoCodes = {
   "Norwegen": "2600",
   "Nepal": "5803",
   "Nauru": "6014",
-  "Niue (Neuseeländische Verwaltung)": "6013",
+  "Niue": "6013", // Korrigiert von "Niue (Neuseeländische Verwaltung)"
   "Neuseeland": "6100",
   "Oman": "5605",
-  "Panama und Panama, Kanalzone": "3711",
+  "Panama": "3711", // Korrigiert von "Panama und Panama, Kanalzone"
   "Peru": "3710",
-  "Französisch Polynesien": "6018",
-  "Papua Neuguinea": "6017",
+  "Französisch-Polynesien": "6018", // Korrigiert von "Französisch Polynesien"
+  "Papua-Neuguinea": "6017", // Korrigiert von "Papua Neuguinea"
   "Philippinen": "5905",
   "Pakistan": "5802",
   "Polen": "2700",
-  "St. Pierre und Miquelon": "3706",
-  "Pitcairn Inseln": "6015",
-  "Puerto Rico (US-Verwaltung)": "3709",
-  "Palästina, Besetzt": "5604",
+  "Saint-Pierre und Miquelon": "3706", // Korrigiert von "St. Pierre und Miquelon"
+  "Pitcairn": "6015", // Korrigiert von "Pitcairn Inseln"
+  "Puerto Rico": "3709", // Korrigiert von "Puerto Rico (US-Verwaltung)"
+  "Palästina (Staat)": "5604", // Korrigiert von "Palästina, Besetzt"
   "Portugal": "2800",
   "Palau": "6016",
   "Paraguay": "3708",
   "Katar": "5603",
-  "Réunion (Französische Verwaltung)": "5717",
+  "Réunion": "5717", // Korrigiert von "Réunion (Französische Verwaltung)"
   "Rumänien": "2900",
   "Serbien": "2204",
   "Russland": "9100",
@@ -322,9 +374,9 @@ const fallbackIsoCodes = {
   "Sudan": "5715",
   "Schweden": "3100",
   "Singapur": "5903",
-  "St. Helena": "5713",
+  "St. Helena, Ascension und Tristan da Cunha": "5713", // Korrigiert von "St. Helena"
   "Slowenien": "5200",
-  "Spitzbergen und Jan Mayen Inseln (Norwegische Verwaltung)": "4012",
+  "Svalbard und Jan Mayen": "4012", // Korrigiert von "Spitzbergen und Jan Mayen Inseln (Norwegische Verwaltung)"
   "Slowakei": "1000",
   "Sierra Leone": "5712",
   "San Marino": "4011",
@@ -332,19 +384,19 @@ const fallbackIsoCodes = {
   "Somalia": "5711",
   "Spanien": "3300",
   "Suriname": "3705",
-  "Südsudan": "SSD",        // Keine Nummer gefunden
+  "Südsudan": "SSD", // Keine Nummer gefunden, nationaler Code
   "São Tomé und Príncipe": "5710",
   "El Salvador": "3707",
-  "St. Maarten": "SXM",      // Keine Nummer gefunden
+  "St. Martin (niederländischer Teil)": "SXM", // Korrigiert von "St. Maarten"
   "Syrien": "5602",
-  "Eswatini": "5709",
+  "Eswatini": "5709", // Korrigiert von "Swasiland"
   "Turks- und Caicosinseln": "4010",
   "Tschad": "5707",
-  "Französische Südgebiete": "5756",
+  "Französische Süd- und Antarktisgebiete": "5756", // Korrigiert von "Französische Südgebiete"
   "Togo": "5706",
   "Thailand": "5902",
   "Tadschikistan": "8703",
-  "Tokelau (Neuseeländische Verwaltung)": "6020",
+  "Tokelau": "6020", // Korrigiert von "Tokelau (Neuseeländische Verwaltung)"
   "Timor-Leste": "5801",
   "Turkmenistan": "8702",
   "Tunesien": "5705",
@@ -353,23 +405,22 @@ const fallbackIsoCodes = {
   "Trinidad und Tobago": "3704",
   "Tuvalu": "6022",
   "Taiwan": "6500",
-  "Tansania, Vereinigte Republik": "5704",
+  "Tansania": "5704", // Korrigiert von "Tansania, Vereinigte Republik"
   "Ukraine": "9200",
   "Uganda": "5703",
-  "Kleinere Amerikanische Überseeinseln": "4009",       // Keine exakte Nummer für UMI gefunden
+  "Kleinere Amerikanische Überseeinseln": "4009",
   "Vereinigte Staaten von Amerika": "3900",
-  "Vereinigtes Königreich Großbritannien und Nordirland": "1600",
   "Uruguay": "3703",
   "Usbekistan": "8701",
-  "Vatikan": "4008",
+  "Vatikanstadt": "4008", // Korrigiert von "Vatikan"
   "St. Vincent und die Grenadinen": "3702",
-  "Venezuela": "3701",
-  "Jungfern-Inseln (Britisch)": "4007",
-  "Jungfern-Inseln (USA)": "4006",
+  "Venezuela (Bolivarische Republik)": "3701", // Korrigiert von "Venezuela"
+  "Britische Jungferninseln": "4007", // Korrigiert von "Jungfern-Inseln (Britisch)"
+  "Amerikanische Jungferninseln": "4006", // Korrigiert von "Jungfern-Inseln (USA)"
   "Vietnam": "5901",
   "Vanuatu": "6026",
   "Wallis und Futuna": "6027",
-  "Samoa-West": "6028",
+  "Samoa": "6028", // Korrigiert von "Samoa-West"
   "Kosovo": "2205",
   "Jemen": "5601",
   "Mayotte": "5721",
