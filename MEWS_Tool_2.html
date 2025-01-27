@@ -25,7 +25,7 @@
   <!-- Excel-Dateiupload -->
   <div class="mb-3">
     <label for="excelFile" class="form-label">
-      Excel-Datei (Tab "Reservierungen") auswählen:
+      Reservierungs&uuml;bersicht Excel-Datei aus MEWS auswählen:
     </label>
     <input 
       type="file" 
@@ -55,7 +55,7 @@
 
   <div class="card">
     <div class="card-header">
-      Erzeugtes CSV (Code;Land;SummePersonen;SummeBetten)
+      Erzeugtes CSV (Code;Land;SummeAnkuenfte;SummeNaechtigungen)
     </div>
     <div class="card-body">
       <!-- Hier kommt das generierte CSV hinein -->
@@ -745,7 +745,7 @@ function verarbeiteDaten(){
   }
 
   // 7.1) Summen bilden & CSV erstellen
-  const linesOut = [ "Code;Land;SummePersonen;SummeBetten" ];
+  const linesOut = [ "Code;Land;SummeAnkuenfte;SummeNaechtigungen" ];
   let totalPersons = 0;
   let totalBetten  = 0;
 
@@ -761,8 +761,8 @@ function verarbeiteDaten(){
 
   // Zusammenfassung ausgeben
   const summaryText = 
-    "Gesamtsumme Personen: " + totalPersons + 
-    " | Gesamtsumme Betten: " + totalBetten;
+    "Gesamtsumme Ank&uuml;nfte: " + totalPersons + 
+    " | Gesamtsumme N&auml;chtigungen: " + totalBetten;
   $("#summaryTotals").text(summaryText);
 
   // Download-Button (de-)aktivieren
