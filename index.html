@@ -1,0 +1,2751 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Statistikmeldung – VieTOUR Converter</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+
+  <style>
+    :root{
+      --bg:#f6f3ee;
+      --card:#ffffff;
+      --ink:#1f1f1c;
+      --muted:#6b6a66;
+      --line:#e7e1d7;
+      --accent:#b88d54;
+      --accent-dark:#8f6837;
+      --success:#2c6b47;
+      --warn:#9a6a1e;
+      --danger:#a52d2d;
+      --info:#5673a6;
+      --shadow:0 10px 30px rgba(25,25,25,.06);
+    }
+
+    html,body{
+      background:linear-gradient(180deg,#f8f6f1 0%, #f4efe7 100%);
+      color:var(--ink);
+      font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    }
+
+    .app-shell{
+      max-width:1460px;
+      margin:0 auto;
+      padding:24px 16px 48px;
+    }
+
+    .hero{
+      background:
+        radial-gradient(circle at top right, rgba(184,141,84,.14), transparent 28%),
+        linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.86));
+      border:1px solid rgba(255,255,255,.8);
+      border-radius:32px;
+      box-shadow:var(--shadow);
+      padding:28px 24px;
+      margin-bottom:20px;
+      overflow:hidden;
+    }
+
+    .eyebrow{
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      font-size:.76rem;
+      color:var(--accent-dark);
+      font-weight:700;
+      margin-bottom:10px;
+    }
+
+    .hero h1{
+      font-size: clamp(1.7rem, 3.4vw, 2.8rem);
+      line-height:1.03;
+      font-weight:800;
+      margin:0 0 10px 0;
+    }
+
+    .hero p{
+      max-width:920px;
+      color:var(--muted);
+      margin:0;
+      font-size:1rem;
+    }
+
+    .stepper{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:14px;
+      margin-bottom:18px;
+    }
+
+    @media (max-width: 980px){
+      .stepper{ grid-template-columns:1fr 1fr; }
+    }
+
+    @media (max-width: 620px){
+      .stepper{ grid-template-columns:1fr; }
+    }
+
+    .step-item{
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.88);
+      border-radius:22px;
+      box-shadow:var(--shadow);
+      padding:16px;
+      display:flex;
+      gap:12px;
+      align-items:flex-start;
+      transition:.2s ease;
+      cursor:pointer;
+    }
+
+    .step-item[disabled]{
+      cursor:not-allowed;
+      opacity:.64;
+    }
+
+    .step-item:not([disabled]):hover{
+      transform:translateY(-1px);
+      border-color:#d8cfbf;
+    }
+
+    .step-item.active{
+      border-color:var(--accent);
+      background:#fffaf3;
+    }
+
+    .step-item.done{
+      border-color:#cfe1d4;
+      background:#fbfffc;
+    }
+
+    .step-bubble{
+      width:38px;
+      height:38px;
+      border-radius:999px;
+      display:grid;
+      place-items:center;
+      font-weight:800;
+      flex:0 0 auto;
+      background:#f3eee5;
+      color:#5d5243;
+      border:1px solid #e3dacb;
+    }
+
+    .step-item.active .step-bubble{
+      background:rgba(184,141,84,.14);
+      border-color:#dcc29a;
+      color:var(--accent-dark);
+    }
+
+    .step-item.done .step-bubble{
+      background:rgba(44,107,71,.12);
+      border-color:rgba(44,107,71,.18);
+      color:var(--success);
+    }
+
+    .step-text{ min-width:0; }
+    .step-title{ font-weight:800; margin-bottom:4px; }
+    .step-subtitle{ color:var(--muted); font-size:.9rem; line-height:1.3; }
+
+    .panel{
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:24px;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+      margin-bottom:20px;
+    }
+
+    .panel-header{
+      padding:18px 20px 10px;
+      border-bottom:1px solid rgba(231,225,215,.7);
+    }
+
+    .panel-title{
+      margin:0;
+      font-size:1.12rem;
+      font-weight:800;
+    }
+
+    .panel-subtitle{
+      color:var(--muted);
+      margin-top:6px;
+      font-size:.94rem;
+    }
+
+    .panel-body{ padding:20px; }
+
+    .field-card{
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:14px 16px;
+      min-height:88px;
+    }
+
+    .field-label{
+      display:block;
+      font-size:.78rem;
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:.06em;
+      font-weight:700;
+      margin-bottom:8px;
+    }
+
+    .dropzone{
+      cursor:pointer;
+      border:1.5px dashed #d2c4ae;
+      background:linear-gradient(180deg,#fff,#faf7f2);
+      border-radius:18px;
+      padding:18px;
+      min-height:88px;
+      display:flex;
+      align-items:center;
+      gap:14px;
+      transition:.2s ease;
+    }
+
+    .dropzone:hover,
+    .dropzone.is-dragover{
+      border-color:var(--accent);
+      background:#fffcf7;
+      transform:translateY(-1px);
+    }
+
+    .drop-icon{
+      width:44px;
+      height:44px;
+      border-radius:14px;
+      display:grid;
+      place-items:center;
+      background:rgba(184,141,84,.12);
+      color:var(--accent-dark);
+      font-weight:900;
+      flex:0 0 auto;
+    }
+
+    .field-value{
+      font-weight:700;
+      color:var(--ink);
+    }
+
+    .step1-grid{
+      display:grid;
+      grid-template-columns:1.6fr 240px 260px;
+      gap:14px;
+      align-items:stretch;
+    }
+
+    @media (max-width: 1080px){
+      .step1-grid{ grid-template-columns:1fr; }
+    }
+
+    .step1-actions{
+      display:flex;
+      justify-content:flex-end;
+      margin-top:16px;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .btn-soft{
+      background:#fff;
+      border:1px solid var(--line);
+      color:var(--ink);
+    }
+
+    .btn-soft:hover{
+      background:#faf8f4;
+      border-color:#d8cfbf;
+      color:var(--ink);
+    }
+
+    .btn-accent{
+      background:var(--accent);
+      border-color:var(--accent);
+      color:#fff;
+    }
+
+    .btn-accent:hover{
+      background:var(--accent-dark);
+      border-color:var(--accent-dark);
+      color:#fff;
+    }
+
+    .btn-successish{
+      background:var(--success);
+      border-color:var(--success);
+      color:#fff;
+    }
+
+    .btn-successish:hover{
+      background:#215539;
+      border-color:#215539;
+      color:#fff;
+    }
+
+    .alert-stack .alert{
+      border-radius:16px;
+      margin-bottom:10px;
+    }
+
+    .stat-grid{
+      display:grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap:12px;
+      margin-bottom:18px;
+    }
+
+    @media (max-width: 1180px){
+      .stat-grid{ grid-template-columns: repeat(3,1fr); }
+    }
+
+    @media (max-width: 700px){
+      .stat-grid{ grid-template-columns: 1fr; }
+    }
+
+    .stat-card{
+      background:linear-gradient(180deg,#fff,#faf7f2);
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:16px;
+    }
+
+    .stat-label{
+      color:var(--muted);
+      font-size:.8rem;
+      text-transform:uppercase;
+      letter-spacing:.05em;
+      font-weight:700;
+    }
+
+    .stat-value{
+      margin-top:8px;
+      font-size:1.65rem;
+      font-weight:900;
+    }
+
+    .summary-bar{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      align-items:center;
+      justify-content:space-between;
+      background:#fcfaf6;
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:14px 16px;
+      margin-bottom:18px;
+    }
+
+    .summary-text{ font-weight:700; }
+    .summary-hint{ color:var(--muted); font-size:.9rem; }
+
+    .table-wrap{
+      border:1px solid var(--line);
+      border-radius:18px;
+      overflow:auto;
+      background:#fff;
+    }
+
+    pre.output{
+      background:#fcfbf8;
+      border:1px solid var(--line);
+      border-radius:18px;
+      min-height:280px;
+      padding:16px;
+      margin:0;
+      white-space:pre-wrap;
+      font-size:.92rem;
+    }
+
+    .step-actions-row{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:space-between;
+      align-items:center;
+      margin-top:18px;
+    }
+
+    .step-actions-group{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .badge-soft{
+      background:#f3eee5;
+      color:#5d5243;
+      border:1px solid #e3dacb;
+      padding:.35rem .55rem;
+      border-radius:999px;
+      font-size:.76rem;
+      font-weight:700;
+      display:inline-flex;
+      gap:6px;
+      align-items:center;
+    }
+
+    .small-help{
+      color:var(--muted);
+      font-size:.86rem;
+    }
+
+    .mono{
+      font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+
+    .hidden{ display:none !important; }
+
+    .section-divider{
+      border-top:1px solid var(--line);
+      margin:18px 0;
+    }
+
+    .accordion-button{
+      font-weight:700;
+      background:#fffaf3;
+    }
+
+    .accordion-button:not(.collapsed){
+      background:#f7f1e8;
+      color:var(--ink);
+      box-shadow:none;
+    }
+
+    .accordion-item{
+      border:1px solid var(--line) !important;
+      border-radius:18px !important;
+      overflow:hidden;
+      margin-bottom:14px;
+    }
+
+    .vietour-picker-input{ cursor:text; }
+
+    .floating-target-picker{
+      position:fixed;
+      z-index:99999;
+      width:320px;
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:14px;
+      box-shadow:0 18px 40px rgba(0,0,0,.12);
+      padding:8px;
+    }
+
+    .floating-target-picker.hidden{ display:none; }
+
+    .floating-target-picker select{
+      width:100%;
+      font-size:.92rem;
+    }
+
+    .log-list{
+      max-height:520px;
+      overflow:auto;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+
+    .log-item{
+      border:1px solid var(--line);
+      border-left:5px solid #c7bba7;
+      border-radius:16px;
+      background:#fff;
+      padding:12px 14px;
+    }
+
+    .log-item.info{ border-left-color:#7a8fbd; }
+    .log-item.success{ border-left-color:var(--success); }
+    .log-item.warn{ border-left-color:var(--warn); }
+    .log-item.error{ border-left-color:var(--danger); }
+
+    .log-meta{
+      font-size:.74rem;
+      color:var(--muted);
+      margin-bottom:4px;
+    }
+
+    .log-message{
+      font-size:.93rem;
+      white-space:pre-wrap;
+    }
+
+    .step-section.hidden{ display:none; }
+
+    .resolve-toolbar{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+      align-items:center;
+      margin-bottom:16px;
+      padding:14px 16px;
+      background:#fcfaf6;
+      border:1px solid var(--line);
+      border-radius:18px;
+    }
+
+    .resolve-stack{
+      display:flex;
+      flex-direction:column;
+      gap:16px;
+    }
+
+    .resolve-card{
+      border:1px solid var(--line);
+      border-radius:22px;
+      background:linear-gradient(180deg,#fff,#fcfaf6);
+      padding:18px;
+      box-shadow:0 8px 24px rgba(30,30,30,.04);
+    }
+
+    .resolve-head{
+      display:flex;
+      justify-content:space-between;
+      gap:14px;
+      align-items:flex-start;
+      flex-wrap:wrap;
+      margin-bottom:14px;
+    }
+
+    .resolve-title{
+      font-size:1.03rem;
+      font-weight:800;
+      line-height:1.3;
+    }
+
+    .resolve-subline{
+      color:var(--muted);
+      font-size:.9rem;
+      margin-top:4px;
+    }
+
+    .resolve-tags{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    .resolve-badge{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:.38rem .62rem;
+      border-radius:999px;
+      font-size:.76rem;
+      font-weight:700;
+      border:1px solid var(--line);
+      background:#fff;
+    }
+
+    .resolve-badge.warn{
+      background:#fff8ed;
+      border-color:#ecd6b1;
+      color:#8b6120;
+    }
+
+    .resolve-grid{
+      display:grid;
+      grid-template-columns:1.2fr .95fr;
+      gap:18px;
+      align-items:start;
+    }
+
+    @media (max-width: 980px){
+      .resolve-grid{ grid-template-columns:1fr; }
+    }
+
+    .resolve-info-grid{
+      display:grid;
+      grid-template-columns:repeat(2, minmax(180px,1fr));
+      gap:12px;
+    }
+
+    @media (max-width: 700px){
+      .resolve-info-grid{ grid-template-columns:1fr; }
+    }
+
+    .resolve-field{
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:12px 14px;
+      min-height:76px;
+    }
+
+    .resolve-field.wide{ grid-column:1 / -1; }
+
+    .resolve-field-label{
+      display:block;
+      font-size:.76rem;
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:.05em;
+      font-weight:700;
+      margin-bottom:8px;
+    }
+
+    .resolve-field-value{
+      font-weight:700;
+      line-height:1.45;
+      word-break:break-word;
+    }
+
+    .resolve-field-value.muted{
+      color:var(--muted);
+      font-weight:600;
+    }
+
+    .resolve-actions{
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:14px;
+    }
+
+    .resolve-actions .form-label{
+      font-size:.78rem;
+      text-transform:uppercase;
+      letter-spacing:.05em;
+      color:var(--muted);
+      font-weight:700;
+      margin-bottom:6px;
+    }
+
+    .resolve-actions .action-block + .action-block{
+      margin-top:12px;
+    }
+
+    .resolve-actions .btn{
+      width:100%;
+    }
+
+    .quick-code-grid{
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0,1fr));
+      gap:8px;
+    }
+
+    @media (max-width: 600px){
+      .quick-code-grid{ grid-template-columns:1fr; }
+    }
+
+    .btn-quick-code{
+      text-align:left;
+      font-size:.9rem;
+      padding:.6rem .75rem;
+    }
+
+    .empty-state{
+      border:1px dashed #d8cfbf;
+      border-radius:22px;
+      padding:28px 20px;
+      text-align:center;
+      background:#fffdf9;
+      color:var(--muted);
+    }
+
+    .final-grid{
+      display:grid;
+      grid-template-columns:1fr 360px;
+      gap:18px;
+      align-items:start;
+    }
+
+    @media (max-width: 980px){
+      .final-grid{ grid-template-columns:1fr; }
+    }
+
+    .final-card{
+      border:1px solid var(--line);
+      border-radius:20px;
+      background:#fcfaf6;
+      padding:18px;
+    }
+
+    .final-download{
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      justify-content:center;
+      align-items:stretch;
+      min-height:100%;
+    }
+
+    .final-status{
+      font-weight:700;
+      margin-bottom:8px;
+    }
+
+    .final-list{
+      display:grid;
+      gap:10px;
+      margin-top:12px;
+    }
+
+    .final-list-item{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      padding:10px 12px;
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:14px;
+      font-weight:700;
+    }
+
+    .footer-note{
+      color:var(--muted);
+      font-size:.84rem;
+      text-align:center;
+      margin-top:20px;
+    }
+
+    .minimal-footer{
+      margin-top:24px;
+      padding:18px 8px 4px;
+      text-align:center;
+      color:var(--muted);
+      font-size:.85rem;
+    }
+
+    .minimal-footer-main{
+      display:flex;
+      flex-wrap:wrap;
+      justify-content:center;
+      align-items:center;
+      gap:10px 14px;
+      line-height:1.5;
+    }
+
+    .minimal-footer a{
+      color:#5f574d;
+      text-decoration:none;
+      transition:.18s ease;
+    }
+
+    .minimal-footer a:hover{
+      color:var(--accent-dark);
+      text-decoration:underline;
+    }
+
+    .minimal-footer-sep{ color:#c8b9a4; }
+
+    .minimal-footer details{ margin-top:8px; }
+
+    .minimal-footer summary{
+      list-style:none;
+      cursor:pointer;
+      color:#7a7064;
+      font-size:.8rem;
+      user-select:none;
+    }
+
+    .minimal-footer summary::-webkit-details-marker{ display:none; }
+
+    .minimal-footer summary:hover{ color:var(--accent-dark); }
+
+    .minimal-footer-note{
+      margin-top:8px;
+      font-size:.78rem;
+      color:#8a8177;
+      line-height:1.5;
+    }
+
+    .footer-heart{ color:#c35a5a; }
+  </style>
+</head>
+<body>
+<div class="app-shell">
+
+  <section class="hero">
+    <div class="eyebrow">Statistikmeldung</div>
+    <h1>VieTOUR Converter</h1>
+    <p>
+      Für deutsche und englische MEWS-Exporte. Stornierte Reservierungen werden exkludiert,
+      Deutschland und Österreich nach Bundesland zugeordnet und problematische Fälle können
+      direkt nachbearbeitet werden.
+    </p>
+  </section>
+
+  <div class="stepper" id="stepper">
+    <button type="button" class="step-item" data-step="1">
+      <div class="step-bubble">1</div>
+      <div class="step-text">
+        <div class="step-title">Datei & Einstellungen</div>
+        <div class="step-subtitle">Export wählen und Auswertung starten</div>
+      </div>
+    </button>
+
+    <button type="button" class="step-item" data-step="2" disabled>
+      <div class="step-bubble">2</div>
+      <div class="step-text">
+        <div class="step-title">Auswertung prüfen</div>
+        <div class="step-subtitle">Kennzahlen und CSV-Vorschau kontrollieren</div>
+      </div>
+    </button>
+
+    <button type="button" class="step-item" data-step="3" disabled>
+      <div class="step-bubble">3</div>
+      <div class="step-text">
+        <div class="step-title">Manuell zuordnen</div>
+        <div class="step-subtitle">Nur bei offenen Fällen erforderlich</div>
+      </div>
+    </button>
+
+    <button type="button" class="step-item" data-step="4" disabled>
+      <div class="step-bubble">4</div>
+      <div class="step-text">
+        <div class="step-title">Download</div>
+        <div class="step-subtitle">Finale CSV herunterladen</div>
+      </div>
+    </button>
+  </div>
+
+  <div class="alert-stack" id="alerts"></div>
+
+  <section class="panel step-section" id="step1Section">
+    <div class="panel-header">
+      <h2 class="panel-title">Schritt 1 – Datei & Einstellungen</h2>
+      <div class="panel-subtitle">
+        Datei auswählen, Berichtsmonat festlegen und anschließend die Auswertung starten.
+      </div>
+    </div>
+    <div class="panel-body">
+      <div class="step1-grid">
+        <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Datei hochladen">
+          <div class="drop-icon">⇪</div>
+          <div>
+            <div class="field-label mb-1">Excel / CSV Datei</div>
+            <div class="field-value" id="dropzoneLabel">Datei hierher ziehen oder klicken</div>
+            <div class="small-help">Akzeptiert: .xlsx, .xls, .csv</div>
+          </div>
+          <input type="file" id="excelFile" accept=".xlsx,.xls,.csv" hidden />
+        </div>
+
+        <div class="field-card">
+          <label class="field-label" for="reportMonth">Berichtsmonat</label>
+          <select id="reportMonth" class="form-select"></select>
+        </div>
+
+        <div class="field-card">
+          <label class="field-label" for="countrySource">Länderquelle</label>
+          <select id="countrySource" class="form-select">
+            <option value="auto" selected>Auto (Adresse, dann Nationalität)</option>
+            <option value="address">Nur Adresse</option>
+            <option value="nationality">Nur Nationalität</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="step1-actions">
+        <button id="btnProcess" class="btn btn-accent btn-lg" disabled>Auswertung starten</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel step-section hidden" id="step2Section">
+    <div class="panel-header">
+      <h2 class="panel-title">Schritt 2 – Auswertung prüfen</h2>
+      <div class="panel-subtitle">
+        Prüfe die Kennzahlen und die erzeugte CSV-Vorschau. Falls offene Fälle bestehen, geht es in Schritt 3 weiter.
+      </div>
+    </div>
+    <div class="panel-body">
+      <div class="stat-grid">
+        <div class="stat-card"><div class="stat-label">Zeilen gelesen</div><div class="stat-value" id="statRowsTotal">0</div></div>
+        <div class="stat-card"><div class="stat-label">Verarbeitet</div><div class="stat-value" id="statRowsProcessed">0</div></div>
+        <div class="stat-card"><div class="stat-label">Storniert</div><div class="stat-value" id="statRowsCancelled">0</div></div>
+        <div class="stat-card"><div class="stat-label">Übersprungen</div><div class="stat-value" id="statRowsSkipped">0</div></div>
+        <div class="stat-card"><div class="stat-label">Ungelöste Fälle</div><div class="stat-value" id="statUnresolved">0</div></div>
+        <div class="stat-card"><div class="stat-label">CSV-Zeilen</div><div class="stat-value" id="statCsvLines">0</div></div>
+      </div>
+
+      <div class="summary-bar">
+        <div>
+          <div class="summary-text" id="summaryTotals">Noch keine Auswertung vorhanden.</div>
+          <div class="summary-hint" id="step2Hint">Bitte zuerst in Schritt 1 eine Datei auswerten.</div>
+        </div>
+        <span class="badge-soft" id="step2StatusBadge">Warte auf Auswertung</span>
+      </div>
+
+      <div class="panel border-0 shadow-none mb-0">
+        <div class="panel-header px-0 pt-0">
+          <h3 class="panel-title">CSV Vorschau</h3>
+          <div class="panel-subtitle">Exportformat: <span class="mono">Code;Land;SummeAnkuenfte;SummeNaechtigungen</span></div>
+        </div>
+        <div class="panel-body px-0 pb-0">
+          <pre id="outputField" class="output"></pre>
+        </div>
+      </div>
+
+      <div class="step-actions-row">
+        <div class="step-actions-group">
+          <button class="btn btn-soft" id="btnBackToStep1">Zurück zu Schritt 1</button>
+          <button class="btn btn-soft" id="btnReprocess">Erneut auswerten</button>
+        </div>
+        <div class="step-actions-group">
+          <button class="btn btn-accent hidden" id="btnGoToStep3">Weiter zu Schritt 3</button>
+          <button class="btn btn-successish hidden" id="btnGoToStep4From2">Weiter zu Schritt 4</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel step-section hidden" id="step3Section">
+    <div class="panel-header">
+      <h2 class="panel-title">Schritt 3 – Manuelle Zuordnung</h2>
+      <div class="panel-subtitle">
+        Jeder offene Fall wird als eigene Karte dargestellt. Zusätzlich stehen Schnellzuordnungen für
+        <strong>Unbekannt</strong>, <strong>Ungeklärt</strong> und Sammelcodes zur Verfügung.
+      </div>
+    </div>
+    <div class="panel-body">
+      <div class="resolve-toolbar">
+        <div>
+          <div class="fw-bold" id="unresolvedHeadline">Keine offenen Fälle.</div>
+          <div class="small-help" id="unresolvedSubheadline">Wenn alles automatisch erkannt wurde, kannst du direkt zu Schritt 4 wechseln.</div>
+        </div>
+        <span class="badge-soft" id="unresolvedCountBadge">0 offen</span>
+      </div>
+
+      <div id="unresolvedList" class="resolve-stack"></div>
+
+      <div class="step-actions-row">
+        <div class="step-actions-group">
+          <button class="btn btn-soft" id="btnBackToStep2">Zurück zu Schritt 2</button>
+        </div>
+        <div class="step-actions-group">
+          <button class="btn btn-successish" id="btnGoToStep4From3" disabled>Weiter zu Schritt 4</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel step-section hidden" id="step4Section">
+    <div class="panel-header">
+      <h2 class="panel-title">Schritt 4 – Download</h2>
+      <div class="panel-subtitle">
+        Finale Prüfung und Download der fertigen CSV-Datei.
+      </div>
+    </div>
+    <div class="panel-body">
+      <div class="final-grid">
+        <div class="final-card">
+          <div class="final-status" id="finalStatusText">Noch keine auswertbare Datei vorhanden.</div>
+          <div class="small-help" id="finalStatusHint">Bitte zuerst Schritt 1 ausführen.</div>
+
+          <div class="final-list">
+            <div class="final-list-item">
+              <span>Gesamtsumme Ankünfte</span>
+              <span id="finalArrivals">0</span>
+            </div>
+            <div class="final-list-item">
+              <span>Gesamtsumme Nächtigungen</span>
+              <span id="finalNights">0</span>
+            </div>
+            <div class="final-list-item">
+              <span>CSV-Zeilen</span>
+              <span id="finalCsvLines">0</span>
+            </div>
+            <div class="final-list-item">
+              <span>Offene Zuordnungen</span>
+              <span id="finalUnresolved">0</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="final-card final-download">
+          <div>
+            <div class="field-label mb-1">Exportdatei</div>
+            <div class="fw-bold" id="finalFilename">–</div>
+            <div class="small-help">Der Download ist erst möglich, wenn keine offenen Zuordnungen mehr vorhanden sind.</div>
+          </div>
+
+          <button id="btnDownload" class="btn btn-successish btn-lg" disabled>CSV herunterladen</button>
+          <button class="btn btn-soft" id="btnBackToReview">Zurück zur Prüfung</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="accordion" id="advancedAccordion">
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseMapping">
+          Mapping-Verwaltung
+        </button>
+      </h2>
+      <div id="collapseMapping" class="accordion-collapse collapse" data-bs-parent="#advancedAccordion">
+        <div class="accordion-body">
+          <div class="row g-2">
+            <div class="col-12">
+              <label class="form-label">MEWS-Land / Rohwert</label>
+              <input type="text" id="overrideCountryInput" class="form-control" placeholder="z. B. Curacao oder Germany" />
+            </div>
+            <div class="col-12">
+              <label class="form-label">VieTOUR-Ziel suchen</label>
+              <input type="text" id="overrideTargetSearch" class="form-control vietour-picker-input" autocomplete="off" placeholder="Land / Ziel suchen..." />
+            </div>
+            <div class="col-12 d-grid">
+              <button id="btnSaveCountryOverride" class="btn btn-accent">Länder-Override speichern</button>
+            </div>
+          </div>
+
+          <div class="section-divider"></div>
+
+          <div class="d-flex flex-wrap gap-2 mb-3">
+            <button id="btnExportOverrides" class="btn btn-soft">Overrides exportieren</button>
+            <button id="btnImportOverrides" class="btn btn-soft">Overrides importieren</button>
+            <button id="btnResetOverrides" class="btn btn-soft">Overrides löschen</button>
+            <input type="file" id="mappingImportFile" accept=".json" hidden />
+            <span class="badge-soft" id="overrideStatus">0 Overrides gespeichert</span>
+          </div>
+
+          <div class="table-wrap">
+            <table class="table table-sm align-middle mb-0" id="overrideTable">
+              <thead>
+                <tr>
+                  <th>Typ</th>
+                  <th>Schlüssel</th>
+                  <th>Code</th>
+                  <th>Ziel</th>
+                  <th>Aktion</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseProtocol">
+          Protokoll
+        </button>
+      </h2>
+      <div id="collapseProtocol" class="accordion-collapse collapse" data-bs-parent="#advancedAccordion">
+        <div class="accordion-body">
+          <div class="log-list" id="protocolList"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    Lokale Speicherung im Browser: Overrides, letzter Berichtsmonat und Länderquelle.
+  </div>
+
+  <footer class="minimal-footer">
+    <div class="minimal-footer-main">
+      <span>coded with <span class="footer-heart">♥</span> for Pension Mozart, Vienna</span>
+      <span class="minimal-footer-sep">•</span>
+      <a href="https://www.pension-mozart.at" target="_blank" rel="noopener noreferrer">pension-mozart.at</a>
+      <span class="minimal-footer-sep">•</span>
+      <span>© 2023–2025 SORWELL</span>
+      <span class="minimal-footer-sep">•</span>
+      <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank" rel="noopener noreferrer">AGPL v3</a>
+    </div>
+
+    <details>
+      <summary>Lizenzhinweise</summary>
+      <div class="minimal-footer-note">
+        Eigener Anwendungscode unter GNU AGPL v3.0.
+        Verwendete Bibliotheken: Bootstrap (MIT), SheetJS Community Edition / xlsx (Apache-2.0).
+        Bei öffentlicher Bereitstellung über ein Netzwerk sollte zusätzlich ein Quellcode-Link ergänzt werden.
+      </div>
+    </details>
+  </footer>
+
+</div>
+
+<div id="floatingTargetPicker" class="floating-target-picker hidden">
+  <select id="floatingTargetSelect" class="form-select" size="10"></select>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+<script>
+(() => {
+  const STORAGE_KEYS = {
+    overrides: "vietour_converter_overrides_v9",
+    settings: "vietour_converter_settings_v9"
+  };
+
+  const HEADER_ALIASES = {
+    number: ["Nummer", "Number"],
+    groupName: ["Gruppenname", "Group name"],
+    lastname: ["Nachname", "Last name"],
+    firstname: ["Vorname", "First name"],
+    email: ["E-Mail", "Email"],
+    phone: ["Telefon", "Telephone"],
+    address: ["Adresse", "Address"],
+    nationality: ["Staatsangehörigkeit des Gastes", "Staatsangehoerigkeit des Gastes", "Customer nationality"],
+    status: ["Status"],
+    creator: ["Ersteller", "Creator"],
+    created: ["Erstellt", "Created"],
+    optionEnd: ["Optionsende", "Release"],
+    confirmed: ["Bestätigt", "Bestaetigt", "Confirmed"],
+    cancelled: ["Storniert", "Canceled"],
+    arrival: ["Anreise", "Arrival"],
+    departure: ["Abreise", "Departure"],
+    nights: ["Anzahl (nächte)", "Anzahl (naechte)", "Count (nights)"],
+    persons: ["Personenzahl", "Person count"],
+    bedsPerNight: ["Anzahl (bett, pro Nacht)", "Anzahl (bett, pro nacht)", "Count (bed, nightly)"]
+  };
+
+  const REQUIRED_COLUMN_KEYS = [
+    "number", "lastname", "firstname", "address", "nationality",
+    "status", "cancelled", "arrival", "departure", "persons"
+  ];
+
+  const EXCLUDED_STATUS_PARTS = [
+    "storniert", "canceled", "cancelled", "no-show", "noshow", "option"
+  ];
+
+  const TARGET_LABELS = {
+    "100":"Wien",
+    "200":"Ohne Bundesland-Zuordnung (Österreich)",
+    "7000":"Burgenland",
+    "7100":"Kärnten",
+    "7200":"Niederösterreich",
+    "7300":"Oberösterreich",
+    "7400":"Salzburg",
+    "7500":"Steiermark",
+    "7600":"Tirol",
+    "7700":"Vorarlberg",
+
+    "5300":"Berlin",
+    "8502":"Brandenburg",
+    "8403":"Bremen",
+    "8402":"Hamburg",
+    "8301":"Hessen",
+    "8501":"Mecklenburg-Vorpommern",
+    "8404":"Niedersachsen",
+    "8200":"Nordrhein-Westfalen",
+    "8302":"Rheinland-Pfalz",
+    "8303":"Saarland",
+    "8504":"Sachsen",
+    "8503":"Sachsen-Anhalt",
+    "8401":"Schleswig-Holstein",
+    "8505":"Thüringen",
+    "8100":"Baden-Württemberg",
+    "8000":"Bayern",
+    "1200":"Ohne Bundesland-Zuordnung (Deutschland)",
+
+    "4000":"Übriges Ausland",
+    "4001":"Ungeklärt",
+    "4002":"Unbekannt",
+    "4003":"International",
+    "4004":"Konventionsflüchtling",
+    "4005":"Staatenlos",
+
+    "3700":"Zentral- und Südamerika",
+    "5700":"Übriges Afrika",
+    "5800":"Übriges Asien",
+    "8700":"GUS"
+  };
+
+  const EXPORT_LABELS_BY_CODE = {
+    "100":"Wien (Österreich)",
+    "200":"Ohne Bundesland-Zuordnung (Österreich)",
+    "7000":"Burgenland (Österreich)",
+    "7100":"Kärnten (Österreich)",
+    "7200":"Niederösterreich (Österreich)",
+    "7300":"Oberösterreich (Österreich)",
+    "7400":"Salzburg (Österreich)",
+    "7500":"Steiermark (Österreich)",
+    "7600":"Tirol (Österreich)",
+    "7700":"Vorarlberg (Österreich)",
+
+    "5300":"Berlin (Deutschland)",
+    "8502":"Brandenburg (Deutschland)",
+    "8403":"Bremen (Deutschland)",
+    "8402":"Hamburg (Deutschland)",
+    "8301":"Hessen (Deutschland)",
+    "8501":"Mecklenburg-Vorpommern (Deutschland)",
+    "8404":"Niedersachsen (Deutschland)",
+    "8200":"Nordrhein-Westfalen (Deutschland)",
+    "8302":"Rheinland-Pfalz (Deutschland)",
+    "8303":"Saarland (Deutschland)",
+    "8504":"Sachsen (Deutschland)",
+    "8503":"Sachsen-Anhalt (Deutschland)",
+    "8401":"Schleswig-Holstein (Deutschland)",
+    "8505":"Thüringen (Deutschland)",
+    "8100":"Baden-Württemberg (Deutschland)",
+    "8000":"Bayern (Deutschland)",
+    "1200":"Ohne Bundesland-Zuordnung (Deutschland)",
+
+    "4000":"Übriges Ausland",
+    "4001":"Ungeklärt",
+    "4002":"Unbekannt",
+    "4003":"International",
+    "4004":"Konventionsflüchtling",
+    "4005":"Staatenlos",
+
+    "3700":"Zentral- und Südamerika",
+    "5700":"Übriges Afrika",
+    "5800":"Übriges Asien",
+    "8700":"GUS"
+  };
+
+  const GERMAN_NAME_TO_TARGET = {
+    "Andorra":"4030","Vereinigte Arabische Emirate":"9600","Afghanistan":"5811","Antigua und Barbuda":"4027","Anguilla":"4033","Albanien":"4031","Armenien":"8710","Angola":"5757","Antarktis":"4028","Argentinien":"3738","Amerikanisch-Samoa":"4029","Australien":"6000","Aruba":"4034","Aserbaidschan":"8709","Bosnien und Herzegowina":"2201","Barbados":"4023","Bangladesch":"5810","Belgien":"6200","Burkina Faso":"5753","Bulgarien":"800","Bahrain":"5611","Burundi":"5755","Benin":"5754","St. Barthélemy":"4025","Bermuda":"4024","Brunei Darussalam":"5910","Bolivien (Plurinationaler Staat)":"3736","Bonaire, Sint Eustatius und Saba":"3739","Brasilien":"9400","Bahamas":"4026","Bhutan":"5809","Bouvetinsel":"4022","Botsuana":"5752","Belarus":"8708","Belize":"3737","Kanada":"2300","Kokosinseln/Keelinginseln":"6001","Kongo, Demokratische Republik":"5748","Zentralafrikanische Republik":"5751","Kongo":"5747","Schweiz":"3201","Elfenbeinküste":"5750","Cookinseln":"4002","Chile":"3735","Kamerun":"5749","China":"6701","Kolumbien":"3734","Costa Rica":"3733","Kuba":"3732","Cabo Verde":"5745","Curacao":"3739","Curaçao":"3739","Weihnachtsinsel":"6003","Zypern":"9300","Tschechische Republik":"900","Deutschland":"__DE__","Dschibuti":"5744","Dänemark":"1100","Dominica":"3730","Dominikanische Republik":"3729","Algerien":"5743","Ecuador":"3728","Estland":"8600","Ägypten":"5758","Westsahara":"5741","Eritrea":"5742","Spanien":"3300","Äthiopien":"5740","Finnland":"1300","Fidschi":"6004","Falklandinseln (Malvinen)":"3727","Mikronesien":"6005","Färöer":"4021","Frankreich":"1401","Gabun":"5739","Vereinigtes Königreich Großbritannien und Nordirland":"1600","Grenada":"3725","Georgien":"8707","Französisch-Guayana":"3723","Guernsey":"4019","Ghana":"5738","Gibraltar":"4017","Grönland":"4016","Gambia":"5736","Guinea":"5737","Guadeloupe":"3726","Äquatorialguinea":"5734","Griechenland":"1500","Südgeorgien und die Südlichen Sandwichinseln":"4013","Guatemala":"3724","Guam":"6006","Guinea-Bissau":"5735","Guyana":"3722","Hong Kong":"6702","Hongkong":"6702","Heard und McDonaldinseln":"6007","Honduras":"3721","Kroatien":"5100","Haiti":"3720","Ungarn":"3800","Indonesien":"5909","Irland":"1800","Israel":"1900","Isle of Man":"4015","Indien":"1700","Britisches Territorium im Indischen Ozean":"5733","Irak":"5609","Iran (Islamische Republik)":"5808","Island":"4900","Italien":"2000","Jersey":"4014","Jamaika":"3719","Jordanien":"5608","Japan":"2100","Kenia":"5732","Kirgisistan":"8705","Kambodscha":"5908","Kiribati":"6008","Komoren":"5746","St. Kitts und Nevis":"3718","Nordkorea (Demokratische Volksrepublik)":"5904","Südkorea (Republik)":"6400","Kuwait":"5607","Kaimaninseln":"3731","Kasachstan":"8706","Laos (Demokratische Volksrepublik)":"5907","Libanon":"5606","St. Lucia":"3717","Liechtenstein":"3202","Sri Lanka":"5807","Liberia":"5731","Lesotho":"5729","Litauen":"8900","Luxemburg":"6300","Lettland":"8800","Libyen":"5730","Marokko":"5728","Monaco":"1402","Republik Moldau":"8704","Montenegro":"2203","Saint-Martin (französischer Teil)":"3716","Sankt Martin (franz.)":"3716","Madagaskar":"5727","Marshallinseln":"6009","Nordmazedonien (Republik)":"2202","Mali":"5726","Myanmar":"5805","Mongolei":"5804","Macao":"6703","Nördliche Marianen":"6010","Martinique":"3713","Mauretanien":"5724","Montserrat":"3714","Malta":"9000","Mauritius":"5723","Malediven":"5806","Malawi":"5722","Mexiko":"3715","Malaysia":"5906","Mosambik":"5725","Namibia":"5720","Neukaledonien":"6011","Niger":"5719","Norfolkinsel":"6012","Nigeria":"5718","Nicaragua":"3712","Niederlande":"2500","Norwegen":"2600","Nepal":"5803","Nauru":"6014","Niue":"6013","Neuseeland":"6100","Oman":"5605","Österreich":"__AT__","Oesterreich":"__AT__","Panama":"3711","Peru":"3710","Französisch-Polynesien":"6018","Papua-Neuguinea":"6017","Philippinen":"5905","Pakistan":"5802","Polen":"2700","Saint-Pierre und Miquelon":"3706","Pitcairn":"6015","Puerto Rico":"3709","Palästina (Staat)":"5604","Portugal":"2800","Palau":"6016","Paraguay":"3708","Katar":"5603","Réunion":"5717","Rumänien":"2900","Serbien":"2204","Russland":"9100","Ruanda":"5716","Saudi-Arabien":"9500","Salomonen":"6019","Seychellen":"5708","Sudan":"5715","Schweden":"3100","Singapur":"5903","St. Helena, Ascension und Tristan da Cunha":"5713","Slowenien":"5200","Svalbard und Jan Mayen":"4012","Slowakei":"1000","Sierra Leone":"5712","San Marino":"4011","Senegal":"5714","Somalia":"5711","Suriname":"3705","Südsudan":"5715","São Tomé und Príncipe":"5710","El Salvador":"3707","St. Martin (niederländischer Teil)":"3739","Syrien (Arabische Republik)":"5602","Swasiland":"5709","Eswatini":"5709","Turks- und Caicosinseln":"4010","Tschad":"5707","Französische Süd- und Antarktisgebiete":"5756","Togo":"5706","Thailand":"5902","Tadschikistan":"8703","Tokelau":"6020","Timor-Leste":"5801","Turkmenistan":"8702","Tunesien":"5705","Tonga":"6021","Türkei":"3600","Trinidad und Tobago":"3704","Tuvalu":"6022","Taiwan":"6500","Tansania":"5704","Ukraine":"9200","Uganda":"5703","Kleinere Amerikanische Überseeinseln":"4009","Vereinigte Staaten von Amerika":"3900","Uruguay":"3703","Usbekistan":"8701","Vatikanstadt":"4008","St. Vincent und die Grenadinen":"3702","Venezuela (Bolivarische Republik)":"3701","Britische Jungferninseln":"4007","Amerikanische Jungferninseln":"4006","Vietnam":"5901","Vanuatu":"6026","Wallis und Futuna":"6027","Samoa":"6028","Kosovo":"2205","Jemen":"5601","Mayotte":"5721","Südafrika":"3400","Sambia":"5702","Simbabwe":"5701"
+  };
+
+  const ENGLISH_NAME_TO_TARGET = {
+    "Afghanistan":"5811","Åland Islands":"4032","Albania":"4031","Algeria":"5743","American Samoa":"4029","Andorra":"4030","Angola":"5757","Anguilla":"4033","Antarctica":"4028","Antigua and Barbuda":"4027","Argentina":"3738","Armenia":"8710","Aruba":"4034","Australia":"6000","Austria":"__AT__","Azerbaijan":"8709","Bahamas":"4026","Bahrain":"5611","Bangladesh":"5810","Barbados":"4023","Belarus":"8708","Belgium":"6200","Belize":"3737","Benin":"5754","Bermuda":"4024","Bhutan":"5809","Bolivia (Plurinational State of)":"3736","Bonaire, Sint Eustatius and Saba":"3739","Bosnia and Herzegovina":"2201","Botswana":"5752","Bouvet Island":"4022","Brazil":"9400","British Indian Ocean Territory":"5733","Brunei Darussalam":"5910","Bulgaria":"800","Burkina Faso":"5753","Burundi":"5755","Cabo Verde":"5745","Cambodia":"5908","Cameroon":"5749","Canada":"2300","Cayman Islands":"3731","Central African Republic":"5751","Chad":"5707","Chile":"3735","China":"6701","Christmas Island":"6003","Cocos (Keeling) Islands":"6001","Colombia":"3734","Comoros":"5746","Congo":"5747","Congo (Democratic Republic of the)":"5748","Cook Islands":"4002","Costa Rica":"3733","Côte d'Ivoire":"5750","Croatia":"5100","Cuba":"3732","Curaçao":"3739","Curacao":"3739","Cyprus":"9300","Czech Republic":"900","Denmark":"1100","Djibouti":"5744","Dominica":"3730","Dominican Republic":"3729","Ecuador":"3728","Egypt":"5758","El Salvador":"3707","Equatorial Guinea":"5734","Eritrea":"5742","Estonia":"8600","Eswatini":"5709","Ethiopia":"5740","Falkland Islands (Malvinas)":"3727","Faroe Islands":"4021","Fiji":"6004","Finland":"1300","France":"1401","French Guiana":"3723","French Polynesia":"6018","French Southern Territories":"5756","Gabon":"5739","Gambia":"5736","Georgia":"8707","Germany":"__DE__","Ghana":"5738","Gibraltar":"4017","Greece":"1500","Greenland":"4016","Grenada":"3725","Guadeloupe":"3726","Guam":"6006","Guatemala":"3724","Guernsey":"4019","Guinea":"5737","Guinea-Bissau":"5735","Guyana":"3722","Haiti":"3720","Heard Island and McDonald Islands":"6007","Honduras":"3721","Hong Kong":"6702","Hungary":"3800","Iceland":"4900","India":"1700","Indonesia":"5909","Iran (Islamic Republic of)":"5808","Iraq":"5609","Ireland":"1800","Isle of Man":"4015","Israel":"1900","Italy":"2000","Jamaica":"3719","Japan":"2100","Jersey":"4014","Jordan":"5608","Kazakhstan":"8706","Kenya":"5732","Kiribati":"6008","Korea (Democratic People's Republic of)":"5904","Korea (Republic of)":"6400","Kosovo":"2205","Kuwait":"5607","Kyrgyzstan":"8705","Lao People's Democratic Republic":"5907","Latvia":"8800","Lebanon":"5606","Lesotho":"5729","Liberia":"5731","Libya":"5730","Liechtenstein":"3202","Lithuania":"8900","Luxembourg":"6300","Macao":"6703","Madagascar":"5727","Malawi":"5722","Malaysia":"5906","Maldives":"5806","Mali":"5726","Malta":"9000","Marshall Islands":"6009","Martinique":"3713","Mauritania":"5724","Mauritius":"5723","Mayotte":"5721","Mexico":"3715","Micronesia (Federated States of)":"6005","Moldova (Republic of)":"8704","Monaco":"1402","Mongolia":"5804","Montenegro":"2203","Montserrat":"3714","Morocco":"5728","Mozambique":"5725","Myanmar":"5805","Namibia":"5720","Nauru":"6014","Nepal":"5803","Netherlands":"2500","New Caledonia":"6011","New Zealand":"6100","Nicaragua":"3712","Niger":"5719","Nigeria":"5718","Niue":"6013","Norfolk Island":"6012","Northern Mariana Islands":"6010","Norway":"2600","Oman":"5605","Pakistan":"5802","Palau":"6016","Palestine (State of)":"5604","Panama":"3711","Papua New Guinea":"6017","Paraguay":"3708","Peru":"3710","Philippines":"5905","Pitcairn":"6015","Poland":"2700","Portugal":"2800","Puerto Rico":"3709","Qatar":"5603","Republic of North Macedonia":"2202","Réunion":"5717","Romania":"2900","Russian Federation":"9100","Rwanda":"5716","Saint Barthélemy":"4025","Saint Helena, Ascension and Tristan da Cunha":"5713","Saint Kitts and Nevis":"3718","Saint Lucia":"3717","Saint Martin (Collectivity of France)":"3716","Saint Pierre and Miquelon":"3706","Saint Vincent and the Grenadines":"3702","Samoa":"6028","San Marino":"4011","Sao Tome and Principe":"5710","Saudi Arabia":"9500","Senegal":"5714","Serbia":"2204","Seychelles":"5708","Sierra Leone":"5712","Singapore":"5903","Sint Maarten (Dutch Constituency)":"3739","Slovakia":"1000","Slovenia":"5200","Solomon Islands":"6019","Somalia":"5711","South Africa":"3400","South Georgia and the South Sandwich Islands":"4013","South Sudan":"5715","Spain":"3300","Sri Lanka":"5807","Sudan":"5715","Suriname":"3705","Svalbard and Jan Mayen":"4012","Sweden":"3100","Switzerland":"3201","Syrian Arab Republic":"5602","Taiwan":"6500","Tajikistan":"8703","Tanzania (United Republic of)":"5704","Thailand":"5902","Timor-Leste":"5801","Togo":"5706","Tokelau":"6020","Tonga":"6021","Trinidad and Tobago":"3704","Tunisia":"5705","Türkiye (Turkey)":"3600","Turkey":"3600","Turkmenistan":"8702","Turks and Caicos Islands":"4010","Tuvalu":"6022","Uganda":"5703","Ukraine":"9200","United Arab Emirates":"9600","United Kingdom of Great Britain and Northern Ireland":"1600","United Kingdom":"1600","United States Minor Outlying Islands":"4009","United States of America":"3900","USA":"3900","Uruguay":"3703","Uzbekistan":"8701","Vanuatu":"6026","Vatican City":"4008","Venezuela (Bolivarian Republic)":"3701","Vietnam":"5901","Virgin Islands (British)":"4007","Virgin Islands (U.S.)":"4006","Wallis and Futuna":"6027","Western Sahara":"5741","Yemen":"5601","Zambia":"5702","Zimbabwe":"5701"
+  };
+
+  const EXTRA_NAME_ALIASES = {
+    "United States":"3900",
+    "UK":"1600",
+    "Great Britain":"1600",
+    "Russian Federation":"9100",
+    "Macedonia":"2202",
+    "North Macedonia":"2202",
+    "Palestinian Territories":"5604",
+    "Palestinian Territories - Occupied":"5604",
+    "Palästinens. Gebiete - Besetzt":"5604",
+    "Côte d’Ivoire":"5750",
+    "Ivory Coast":"5750",
+    "South Korea":"6400",
+    "North Korea":"5904",
+    "UAE":"9600"
+  };
+
+  const COUNTRY_NAME_TO_CODE = {
+    ...GERMAN_NAME_TO_TARGET,
+    ...ENGLISH_NAME_TO_TARGET,
+    ...EXTRA_NAME_ALIASES
+  };
+
+  const DE_RANGE_RULES = [
+    ["01001","01936","8504"],["01941","01998","8502"],["02601","02999","8504"],["03001","03253","8502"],["04001","04579","8504"],["04581","04639","8505"],["04641","04889","8504"],["04891","04938","8502"],["06001","06548","8503"],["06551","06578","8505"],["06601","06928","8503"],["07301","07919","8505"],["07919","07919","8504"],["07919","07919","8505"],["07919","07919","8504"],["07920","07950","8505"],["07951","07951","8504"],["07952","07952","8505"],["07952","07952","8504"],["07953","07980","8505"],["07982","07982","8504"],["07985","07985","8505"],["07985","07985","8504"],["07985","07989","8505"],["08001","09669","8504"],
+    ["10001","14330","5300"],["14401","14715","8502"],["14715","14715","8503"],["14723","16949","8502"],["17001","17256","8501"],["17258","17258","8502"],["17258","17259","8501"],["17261","17291","8502"],["17301","17309","8501"],["17309","17309","8502"],["17309","17321","8501"],["17321","17321","8502"],["17321","17322","8501"],["17326","17326","8502"],["17328","17331","8501"],["17335","17335","8502"],["17335","17335","8501"],["17337","17337","8502"],["17337","19260","8501"],["19271","19273","8404"],["19273","19273","8501"],["19273","19306","8501"],["19307","19357","8502"],["19357","19417","8501"],
+    ["20001","21037","8402"],["21039","21039","8401"],["21039","21170","8402"],["21202","21449","8404"],["21451","21521","8401"],["21522","21522","8404"],["21524","21529","8401"],["21601","21789","8404"],["22001","22113","8402"],["22113","22113","8401"],["22115","22143","8402"],["22145","22145","8401"],["22145","22145","8402"],["22145","22145","8401"],["22147","22786","8402"],["22801","23919","8401"],["23921","23999","8501"],["24001","25999","8401"],["26001","27478","8404"],["27483","27498","8401"],["27499","27499","8402"],["27501","27580","8403"],["27607","27809","8404"],["28001","28779","8403"],["28784","29399","8404"],["29401","29416","8503"],["29431","31868","8404"],
+    ["32001","33829","8200"],["34001","34329","8301"],["34331","34353","8404"],["34355","34355","8301"],["34355","34355","8404"],["34356","34399","8301"],["34401","34439","8200"],["34441","36399","8301"],["36401","36469","8505"],["37001","37194","8404"],["37194","37195","8301"],["37197","37199","8404"],["37201","37299","8301"],["37301","37359","8505"],["37401","37649","8404"],["37651","37688","8200"],["37689","37691","8404"],["37692","37696","8200"],["37697","38479","8404"],["38481","38489","8503"],["38501","38729","8404"],["38801","39649","8503"],
+    ["40001","48432","8200"],["48442","48465","8404"],["48466","48477","8200"],["48478","48480","8404"],["48481","48485","8200"],["48486","48488","8404"],["48489","48496","8200"],["48497","48531","8404"],["48541","48739","8200"],["49001","49459","8404"],["49461","49549","8200"],["49551","49849","8404"],
+    ["50101","51597","8200"],["51598","51598","8302"],["51601","53359","8200"],["53401","53579","8302"],["53581","53604","8200"],["53614","53619","8302"],["53621","53949","8200"],["54181","55239","8302"],["55240","55252","8301"],["55253","56869","8302"],["57001","57489","8200"],["57501","57648","8302"],["58001","59966","8200"],["59969","59969","8301"],["59969","59969","8200"],
+    ["60001","63699","8301"],["63701","63774","8000"],["63776","63776","8301"],["63776","63928","8000"],["63928","63928","8100"],["63930","63939","8000"],["64201","64753","8301"],["64754","64754","8100"],["64754","65326","8301"],["65326","65326","8302"],["65327","65391","8301"],["65391","65391","8302"],["65392","65556","8301"],["65558","65582","8302"],["65583","65620","8301"],["65621","65626","8302"],["65627","65627","8301"],["65629","65629","8302"],["65701","65936","8301"],["66001","66459","8303"],["66461","66509","8302"],["66511","66839","8303"],["66841","67829","8302"],["68001","68312","8100"],["68501","68519","8301"],["68520","68549","8100"],["68601","68649","8301"],["68701","69234","8100"],["69235","69239","8301"],["69240","69429","8100"],["69430","69431","8301"],["69434","69434","8100"],["69434","69434","8301"],["69435","69469","8100"],["69479","69488","8301"],["69489","69502","8100"],["69503","69509","8301"],["69510","69514","8100"],["69515","69518","8301"],
+    ["70001","74592","8100"],["74594","74594","8000"],["74594","76709","8100"],["76711","76891","8302"],["77601","79879","8100"],
+    ["80001","87490","8000"],["87493","87561","8000"],["87571","87789","8000"],["88001","88099","8100"],["88101","88146","8000"],["88147","88147","8100"],["88147","88179","8000"],["88181","89079","8100"],["89081","89081","8000"],["89081","89085","8100"],["89087","89087","8000"],["89090","89198","8100"],["89201","89449","8000"],["89501","89619","8100"],
+    ["90001","96489","8000"],["96501","96529","8505"],["97001","97859","8000"],["97861","97877","8100"],["97888","97892","8000"],["97893","97896","8100"],["97896","97896","8000"],["97897","97900","8100"],["97901","97909","8000"],["97911","97999","8100"],["98501","99998","8505"]
+  ];
+
+  const AT_RULES = [
+    { code:"100", exact1:["1"] },
+    { code:"7200", exact1:["2","3"] },
+    { code:"7300", exact1:["4"] },
+    { code:"7400", exact1:["5"] },
+    { code:"7600", exact2Range:[["60","66"]], exact2:["99"] },
+    { code:"7700", exact2Range:[["67","69"]] },
+    { code:"7000", exact1:["7"] },
+    { code:"7500", exact1:["8"] },
+    { code:"7100", exact2Range:[["90","98"]] }
+  ];
+
+  const state = {
+    selectedFile: null,
+    rows: [],
+    columns: {},
+    csvText: "",
+    unresolvedItems: [],
+    protocol: [],
+    summary: {
+      rowsTotal: 0,
+      rowsProcessed: 0,
+      rowsCancelled: 0,
+      rowsSkipped: 0,
+      unresolvedCount: 0,
+      csvLines: 0,
+      arrivals: 0,
+      nights: 0
+    },
+    overrides: {
+      country: {},
+      postalDE: {},
+      postalAT: {},
+      row: {}
+    },
+    codeLabelMap: new Map(),
+    targetOptions: [],
+    floating: {
+      activeInput: null
+    },
+    ui: {
+      currentStep: 1,
+      unlocked: { 1:true, 2:false, 3:false, 4:false }
+    }
+  };
+
+  function norm(v){
+    return String(v || "")
+      .trim()
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+  }
+
+  function normCountry(v){
+    return norm(v)
+      .replace(/[().,'’\-]/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  function esc(v){
+    return String(v || "")
+      .replace(/&/g,"&amp;")
+      .replace(/</g,"&lt;")
+      .replace(/>/g,"&gt;")
+      .replace(/"/g,"&quot;")
+      .replace(/'/g,"&#39;");
+  }
+
+  function setText(id, value){
+    const el = document.getElementById(id);
+    if(el) el.textContent = value;
+  }
+
+  function clearAlerts(){
+    document.getElementById("alerts").innerHTML = "";
+  }
+
+  function addAlert(type, message){
+    const css = {
+      success:"alert-success",
+      warning:"alert-warning",
+      danger:"alert-danger",
+      info:"alert-secondary"
+    }[type] || "alert-secondary";
+
+    const div = document.createElement("div");
+    div.className = "alert " + css;
+    div.textContent = message;
+    document.getElementById("alerts").appendChild(div);
+  }
+
+  function downloadBlob(blob, filename){
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+  }
+
+  function resetSummary(){
+    state.summary = {
+      rowsTotal: 0,
+      rowsProcessed: 0,
+      rowsCancelled: 0,
+      rowsSkipped: 0,
+      unresolvedCount: 0,
+      csvLines: 0,
+      arrivals: 0,
+      nights: 0
+    };
+  }
+
+  function updateSummaryCards(){
+    setText("statRowsTotal", state.summary.rowsTotal);
+    setText("statRowsProcessed", state.summary.rowsProcessed);
+    setText("statRowsCancelled", state.summary.rowsCancelled);
+    setText("statRowsSkipped", state.summary.rowsSkipped);
+    setText("statUnresolved", state.summary.unresolvedCount);
+    setText("statCsvLines", state.summary.csvLines);
+  }
+
+  function buildNameTargetLookup(){
+    const map = new Map();
+    for(const [name, target] of Object.entries(COUNTRY_NAME_TO_CODE)){
+      map.set(normCountry(name), target);
+    }
+    return map;
+  }
+
+  function buildKnownCountryNames(){
+    return Object.keys(COUNTRY_NAME_TO_CODE).sort((a,b) => normCountry(b).length - normCountry(a).length);
+  }
+
+  const NAME_TO_TARGET_LOOKUP = buildNameTargetLookup();
+  const KNOWN_COUNTRY_NAMES = buildKnownCountryNames();
+
+  function addLog(level, message, data = null){
+    state.protocol.unshift({
+      at: new Date().toLocaleString("de-AT"),
+      level,
+      message,
+      data
+    });
+    renderProtocol();
+  }
+
+  function renderProtocol(){
+    const box = document.getElementById("protocolList");
+    if(!state.protocol.length){
+      box.innerHTML = `<div class="small-help">Noch kein Protokolleintrag vorhanden.</div>`;
+      return;
+    }
+
+    box.innerHTML = state.protocol.map(entry => `
+      <div class="log-item ${esc(entry.level)}">
+        <div class="log-meta">${esc(entry.at)} · ${esc(entry.level.toUpperCase())}</div>
+        <div class="log-message">${esc(entry.message)}</div>
+        ${entry.data ? `<pre class="mt-2 mb-0 small">${esc(JSON.stringify(entry.data, null, 2))}</pre>` : ""}
+      </div>
+    `).join("");
+  }
+
+  function buildCodeLabels(){
+    state.codeLabelMap = new Map();
+
+    Object.entries(TARGET_LABELS).forEach(([code, label]) => {
+      state.codeLabelMap.set(String(code), label);
+    });
+
+    Object.entries(COUNTRY_NAME_TO_CODE).forEach(([name, code]) => {
+      if(String(code).startsWith("__")) return;
+      if(!state.codeLabelMap.has(String(code))){
+        state.codeLabelMap.set(String(code), name);
+      }
+    });
+  }
+
+  function targetLabel(code){
+    return state.codeLabelMap.get(String(code)) || `Code ${code}`;
+  }
+
+  function exportLabel(code, fallback){
+    return EXPORT_LABELS_BY_CODE[String(code)] || fallback || targetLabel(code);
+  }
+
+  function buildTargetOptions(){
+    buildCodeLabels();
+    const codes = new Set();
+
+    Object.values(COUNTRY_NAME_TO_CODE).forEach(v => {
+      if(!String(v).startsWith("__")) codes.add(String(v));
+    });
+
+    Object.keys(TARGET_LABELS).forEach(c => codes.add(String(c)));
+
+    state.targetOptions = [...codes]
+      .sort((a,b) => targetLabel(a).localeCompare(targetLabel(b), "de"))
+      .map(code => ({
+        code: String(code),
+        label: targetLabel(code),
+        normLabel: normCountry(targetLabel(code))
+      }));
+  }
+
+  function filteredTargetOptions(searchValue = ""){
+    const q = normCountry(searchValue);
+    if(!q) return state.targetOptions;
+    return state.targetOptions.filter(opt => opt.normLabel.includes(q));
+  }
+
+  function renderFloatingOptions(searchValue = "", selectedCode = ""){
+    const select = document.getElementById("floatingTargetSelect");
+    const filtered = filteredTargetOptions(searchValue);
+
+    select.innerHTML = filtered.map(opt => {
+      const selected = String(opt.code) === String(selectedCode) ? "selected" : "";
+      return `<option value="${esc(opt.code)}" ${selected}>${esc(opt.label)}</option>`;
+    }).join("");
+
+    if(!select.value && filtered.length){
+      select.selectedIndex = 0;
+    }
+  }
+
+  function positionFloatingPicker(input){
+    const picker = document.getElementById("floatingTargetPicker");
+    const rect = input.getBoundingClientRect();
+    const gap = 4;
+    const pad = 8;
+    const spaceBelow = window.innerHeight - rect.bottom - pad;
+    const spaceAbove = rect.top - pad;
+    const idealHeight = 10 * 32 + 24;
+    const placeBelow = spaceBelow >= idealHeight || spaceBelow >= spaceAbove;
+
+    picker.style.width = `${Math.max(280, rect.width)}px`;
+    picker.style.left = `${Math.max(pad, rect.left)}px`;
+
+    const select = document.getElementById("floatingTargetSelect");
+    const usable = Math.max(180, Math.min(idealHeight, placeBelow ? spaceBelow : spaceAbove));
+    select.style.height = `${usable - 16}px`;
+
+    if(placeBelow){
+      picker.style.top = `${rect.bottom + gap}px`;
+    }else{
+      picker.style.top = `${Math.max(pad, rect.top - usable - gap)}px`;
+    }
+  }
+
+  function openPicker(input){
+    state.floating.activeInput = input;
+    renderFloatingOptions(input.value, input.dataset.selectedCode || "");
+    positionFloatingPicker(input);
+    document.getElementById("floatingTargetPicker").classList.remove("hidden");
+  }
+
+  function closePicker(){
+    document.getElementById("floatingTargetPicker").classList.add("hidden");
+    state.floating.activeInput = null;
+  }
+
+  function applyPickerSelection(){
+    const input = state.floating.activeInput;
+    const select = document.getElementById("floatingTargetSelect");
+    if(!input || !select.value) return;
+
+    const option = select.options[select.selectedIndex];
+    input.value = option.textContent;
+    input.dataset.selectedCode = select.value;
+    closePicker();
+  }
+
+  function bindFloatingPicker(){
+    const picker = document.getElementById("floatingTargetPicker");
+    const select = document.getElementById("floatingTargetSelect");
+
+    document.addEventListener("focusin", e => {
+      const input = e.target.closest(".vietour-picker-input");
+      if(!input) return;
+      openPicker(input);
+    });
+
+    document.addEventListener("click", e => {
+      const input = e.target.closest(".vietour-picker-input");
+      const insidePicker = e.target.closest("#floatingTargetPicker");
+
+      if(input){
+        openPicker(input);
+        return;
+      }
+
+      if(!insidePicker){
+        closePicker();
+      }
+    });
+
+    document.addEventListener("input", e => {
+      const input = e.target.closest(".vietour-picker-input");
+      if(!input) return;
+
+      const code = input.dataset.selectedCode || "";
+      if(code){
+        const selected = state.targetOptions.find(x => x.code === code);
+        if(!selected || normCountry(selected.label) !== normCountry(input.value)){
+          input.dataset.selectedCode = "";
+        }
+      }
+
+      openPicker(input);
+    });
+
+    document.addEventListener("keydown", e => {
+      if(e.target.classList.contains("vietour-picker-input")){
+        if(e.key === "ArrowDown"){
+          e.preventDefault();
+          openPicker(e.target);
+          select.focus();
+        } else if(e.key === "Escape"){
+          closePicker();
+        } else if(e.key === "Enter" && !picker.classList.contains("hidden")){
+          e.preventDefault();
+          applyPickerSelection();
+        }
+      } else if(document.activeElement === select){
+        if(e.key === "Enter"){
+          e.preventDefault();
+          applyPickerSelection();
+        } else if(e.key === "Escape"){
+          e.preventDefault();
+          closePicker();
+        }
+      }
+    });
+
+    select.addEventListener("change", applyPickerSelection);
+    select.addEventListener("dblclick", applyPickerSelection);
+
+    window.addEventListener("resize", () => {
+      if(state.floating.activeInput) positionFloatingPicker(state.floating.activeInput);
+    });
+
+    window.addEventListener("scroll", () => {
+      if(state.floating.activeInput) positionFloatingPicker(state.floating.activeInput);
+    }, true);
+  }
+
+  function saveSettings(){
+    localStorage.setItem(STORAGE_KEYS.settings, JSON.stringify({
+      reportMonth: document.getElementById("reportMonth").value,
+      countrySource: document.getElementById("countrySource").value
+    }));
+  }
+
+  function loadSettings(){
+    try{
+      const s = JSON.parse(localStorage.getItem(STORAGE_KEYS.settings) || "{}");
+      if(s.reportMonth) document.getElementById("reportMonth").value = s.reportMonth;
+      if(s.countrySource) document.getElementById("countrySource").value = s.countrySource;
+    }catch(e){}
+  }
+
+  function loadOverrides(){
+    try{
+      const raw = JSON.parse(localStorage.getItem(STORAGE_KEYS.overrides) || "{}");
+      state.overrides.country = raw.country || {};
+      state.overrides.postalDE = raw.postalDE || {};
+      state.overrides.postalAT = raw.postalAT || {};
+      state.overrides.row = raw.row || {};
+    }catch(e){
+      state.overrides = { country:{}, postalDE:{}, postalAT:{}, row:{} };
+    }
+  }
+
+  function saveOverrides(){
+    localStorage.setItem(STORAGE_KEYS.overrides, JSON.stringify(state.overrides));
+    renderOverrideTable();
+  }
+
+  function renderOverrideStatus(){
+    const count =
+      Object.keys(state.overrides.country).length +
+      Object.keys(state.overrides.postalDE).length +
+      Object.keys(state.overrides.postalAT).length +
+      Object.keys(state.overrides.row).length;
+
+    document.getElementById("overrideStatus").textContent = `${count} Overrides gespeichert`;
+  }
+
+  function renderOverrideTable(){
+    const tbody = document.querySelector("#overrideTable tbody");
+    const rows = [];
+
+    Object.entries(state.overrides.country).forEach(([key, value]) => {
+      rows.push({ type:"Land", key:value.raw || key, bucket:"country", storageKey:key, code:value.code });
+    });
+
+    Object.entries(state.overrides.postalDE).forEach(([key, code]) => {
+      rows.push({ type:"DE-PLZ", key, bucket:"postalDE", storageKey:key, code });
+    });
+
+    Object.entries(state.overrides.postalAT).forEach(([key, code]) => {
+      rows.push({ type:"AT-PLZ", key, bucket:"postalAT", storageKey:key, code });
+    });
+
+    Object.entries(state.overrides.row).forEach(([key, value]) => {
+      rows.push({ type:"Zeile", key:value.label || key, bucket:"row", storageKey:key, code:value.code });
+    });
+
+    rows.sort((a,b) => `${a.type} ${a.key}`.localeCompare(`${b.type} ${b.key}`, "de"));
+    renderOverrideStatus();
+
+    if(!rows.length){
+      tbody.innerHTML = `<tr><td colspan="5" class="text-muted">Keine Overrides gespeichert.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = rows.map(row => `
+      <tr>
+        <td>${esc(row.type)}</td>
+        <td>${esc(row.key)}</td>
+        <td class="mono">${esc(String(row.code))}</td>
+        <td>${esc(targetLabel(row.code))}</td>
+        <td><button class="btn btn-sm btn-outline-danger" data-remove-bucket="${esc(row.bucket)}" data-remove-key="${esc(row.storageKey)}">Entfernen</button></td>
+      </tr>
+    `).join("");
+  }
+
+  function detectColumns(headerRow){
+    const normalized = headerRow.map(v => norm(v));
+    const result = {};
+
+    Object.entries(HEADER_ALIASES).forEach(([key, aliases]) => {
+      const aliasNorm = aliases.map(v => norm(v));
+      const idx = normalized.findIndex(h => aliasNorm.includes(h));
+      if(idx >= 0) result[key] = idx;
+    });
+
+    return result;
+  }
+
+  function getCell(row, key){
+    const idx = state.columns[key];
+    return idx === undefined ? undefined : row[idx];
+  }
+
+  function parseDmy(str){
+    const s = String(str || "").trim();
+    let m = s.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})/);
+    if(m) return new Date(+m[3], +m[2]-1, +m[1]);
+
+    m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+    if(m) return new Date(+m[1], +m[2]-1, +m[3]);
+
+    return null;
+  }
+
+  function convertExcelDate(cellVal){
+    if(typeof cellVal === "number"){
+      const d = XLSX.SSF.parse_date_code(cellVal);
+      if(!d) return null;
+      return new Date(d.y, d.m - 1, d.d);
+    }
+    if(typeof cellVal === "string"){
+      return parseDmy(cellVal);
+    }
+    if(cellVal instanceof Date){
+      return cellVal;
+    }
+    return null;
+  }
+
+  function getMonthStart(year, month){
+    return new Date(year, month - 1, 1, 0, 0, 0);
+  }
+
+  function getMonthEnd(year, month){
+    return new Date(year, month, 1, 0, 0, 0);
+  }
+
+  function calcNightsInMonth(arrDate, depDate, repStart, repEnd){
+    if(!arrDate || !depDate) return 0;
+    if(depDate <= repStart) return 0;
+    if(arrDate >= repEnd) return 0;
+
+    const start = arrDate > repStart ? arrDate : repStart;
+    const end = depDate < repEnd ? depDate : repEnd;
+    return Math.max(0, Math.floor((end - start) / 86400000));
+  }
+
+  function isCancelledRow(row){
+    const cancelled = getCell(row, "cancelled");
+    if(cancelled !== undefined && String(cancelled).trim() !== "") return true;
+
+    const status = String(getCell(row, "status") || "").trim().toLowerCase();
+    return EXCLUDED_STATUS_PARTS.some(s => status.includes(s));
+  }
+
+  function readFileAsRows(file){
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+
+      reader.onerror = () => reject(new Error("Datei konnte nicht gelesen werden."));
+      reader.onload = e => {
+        try{
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, { type:"array" });
+
+          const preferredSheetName =
+            workbook.SheetNames.find(n => ["reservierungen","reservations"].includes(norm(n))) ||
+            workbook.SheetNames[0];
+
+          if(!preferredSheetName) throw new Error("Kein Tabellenblatt gefunden.");
+
+          const sheet = workbook.Sheets[preferredSheetName];
+          const rows = XLSX.utils.sheet_to_json(sheet, { header:1, raw:true });
+
+          if(!rows || rows.length < 2){
+            throw new Error("Die Datei enthält keine Datenzeilen.");
+          }
+
+          resolve({ rows, sheetName: preferredSheetName });
+        }catch(err){
+          reject(err);
+        }
+      };
+
+      reader.readAsArrayBuffer(file);
+    });
+  }
+
+  function extractCountryFromAddress(address){
+    const raw = String(address || "").trim();
+    if(!raw) return "";
+
+    const nAddr = normCountry(raw);
+
+    for(const name of KNOWN_COUNTRY_NAMES){
+      if(nAddr.endsWith(normCountry(name))) return name;
+    }
+
+    const parts = raw.split(",");
+    return String(parts[parts.length - 1] || "").trim();
+  }
+
+  function extractCountryFromRow(row){
+    const source = document.getElementById("countrySource").value;
+    const address = String(getCell(row, "address") || "").trim();
+    const nationality = String(getCell(row, "nationality") || "").trim();
+
+    const fromAddress = extractCountryFromAddress(address);
+    const fromNationality = nationality;
+
+    if(source === "address") return fromAddress || fromNationality;
+    if(source === "nationality") return fromNationality || fromAddress;
+    return fromAddress || fromNationality;
+  }
+
+  function extractPlzDE(address){
+    const m = String(address || "").match(/\b\d{5}\b/);
+    return m ? m[0] : "";
+  }
+
+  function extractPlzAT(address){
+    const m = String(address || "").match(/\b\d{4}\b/);
+    return m ? m[0] : "";
+  }
+
+  function rowFingerprint(rawCountry, address){
+    return normCountry(rawCountry) + "||" + normCountry(address);
+  }
+
+  function resolveGermanByPLZ(plz){
+    const cleaned = String(plz || "").replace(/\D+/g, "");
+    if(cleaned.length < 5){
+      return { ok:false, reason:"Keine deutsche PLZ gefunden." };
+    }
+
+    const p = cleaned.slice(0,5);
+
+    if(state.overrides.postalDE[p]){
+      return {
+        ok:true,
+        code:String(state.overrides.postalDE[p]),
+        exportLand:exportLabel(state.overrides.postalDE[p], "Deutschland")
+      };
+    }
+
+    const matches = [];
+    for(const [from, to, code] of DE_RANGE_RULES){
+      if(p >= from && p <= to) matches.push(code);
+    }
+
+    const unique = [...new Set(matches)];
+    if(unique.length === 1){
+      return {
+        ok:true,
+        code:unique[0],
+        exportLand:exportLabel(unique[0], "Deutschland")
+      };
+    }
+
+    if(unique.length > 1){
+      return { ok:false, reason:`Mehrdeutige deutsche PLZ ${p}.`, plz:p, candidates:unique };
+    }
+
+    return { ok:false, reason:`Keine DE-Zuordnung für PLZ ${p}.`, plz:p };
+  }
+
+  function resolveAustrianByPLZ(plz){
+    const cleaned = String(plz || "").replace(/\D+/g, "");
+    if(cleaned.length < 4){
+      return { ok:false, reason:"Keine österreichische PLZ gefunden." };
+    }
+
+    const p = cleaned.slice(0,4);
+
+    if(state.overrides.postalAT[p]){
+      return {
+        ok:true,
+        code:String(state.overrides.postalAT[p]),
+        exportLand:exportLabel(state.overrides.postalAT[p], "Österreich")
+      };
+    }
+
+    const p1 = p.slice(0,1);
+    const p2 = p.slice(0,2);
+
+    for(const rule of AT_RULES){
+      if(rule.exact1 && rule.exact1.includes(p1)){
+        return { ok:true, code:rule.code, exportLand:exportLabel(rule.code, "Österreich") };
+      }
+      if(rule.exact2 && rule.exact2.includes(p2)){
+        return { ok:true, code:rule.code, exportLand:exportLabel(rule.code, "Österreich") };
+      }
+      if(rule.exact2Range){
+        const x = Number(p2);
+        for(const [a,b] of rule.exact2Range){
+          if(x >= Number(a) && x <= Number(b)){
+            return { ok:true, code:rule.code, exportLand:exportLabel(rule.code, "Österreich") };
+          }
+        }
+      }
+    }
+
+    return { ok:false, reason:`Keine AT-Zuordnung für PLZ ${p}.`, plz:p };
+  }
+
+  function resolveCountryCode(rawCountry, address){
+    const cleanCountry = String(rawCountry || "").trim();
+    const cleanAddress = String(address || "").trim();
+    const normKey = normCountry(cleanCountry);
+    const fp = rowFingerprint(cleanCountry, cleanAddress);
+
+    if(state.overrides.row[fp]){
+      return {
+        ok:true,
+        code:String(state.overrides.row[fp].code),
+        exportLand:exportLabel(state.overrides.row[fp].code, cleanCountry)
+      };
+    }
+
+    if(state.overrides.country[normKey]){
+      return {
+        ok:true,
+        code:String(state.overrides.country[normKey].code),
+        exportLand:exportLabel(state.overrides.country[normKey].code, cleanCountry)
+      };
+    }
+
+    const target = NAME_TO_TARGET_LOOKUP.get(normKey);
+
+    if(!target){
+      return { ok:false, reason:"Landname nicht im Mapping gefunden.", type:"country", rawCountry:cleanCountry };
+    }
+
+    if(target === "__DE__"){
+      const plz = extractPlzDE(cleanAddress);
+      const r = resolveGermanByPLZ(plz);
+      if(r.ok) return r;
+      return {
+        ok:false,
+        reason:r.reason,
+        type:"de",
+        rawCountry:cleanCountry,
+        plz,
+        candidates:r.candidates || []
+      };
+    }
+
+    if(target === "__AT__"){
+      const plz = extractPlzAT(cleanAddress);
+      const r = resolveAustrianByPLZ(plz);
+      if(r.ok) return r;
+      return { ok:false, reason:r.reason, type:"at", rawCountry:cleanCountry, plz };
+    }
+
+    return { ok:true, code:String(target), exportLand:cleanCountry };
+  }
+
+  function buildDisplayLandForCode(code, baseLandLabel, rawCountriesSet){
+    if(EXPORT_LABELS_BY_CODE[String(code)]){
+      return baseLandLabel || EXPORT_LABELS_BY_CODE[String(code)];
+    }
+
+    const base = baseLandLabel || targetLabel(code);
+    const raws = [...rawCountriesSet]
+      .map(v => String(v || "").trim())
+      .filter(Boolean)
+      .filter(v => normCountry(v) !== normCountry(base))
+      .sort((a,b) => a.localeCompare(b, "de"));
+
+    if(!raws.length) return base;
+    return `${base} (${raws.join(", ")})`;
+  }
+
+  function renderCsv(text){
+    state.csvText = text || "";
+    document.getElementById("outputField").textContent = state.csvText;
+    updateFinalStep();
+  }
+
+  function buildScopeOptions(item){
+    const options = [];
+
+    if(item.type === "de" && item.plz){
+      options.push(`<option value="postalDE" selected>DE-PLZ ${esc(item.plz)}</option>`);
+      options.push(`<option value="row">nur diese Zeile</option>`);
+    } else if(item.type === "at" && item.plz){
+      options.push(`<option value="postalAT" selected>AT-PLZ ${esc(item.plz)}</option>`);
+      options.push(`<option value="row">nur diese Zeile</option>`);
+    } else if(item.rawCountry){
+      options.push(`<option value="country" selected>Land "${esc(item.rawCountry)}"</option>`);
+      options.push(`<option value="row">nur diese Zeile</option>`);
+    } else {
+      options.push(`<option value="row" selected>nur diese Zeile</option>`);
+    }
+
+    return options.join("");
+  }
+
+  function getQuickCodeButtonsHtml(idx){
+    const quicks = [
+      { code:"4002", label:"Unbekannt" },
+      { code:"4001", label:"Ungeklärt" },
+      { code:"4000", label:"Übriges Ausland" },
+      { code:"3700", label:"Zentral- und Südamerika" },
+      { code:"5800", label:"Übriges Asien" },
+      { code:"5700", label:"Übriges Afrika" },
+      { code:"8700", label:"GUS" }
+    ];
+
+    return `
+      <div class="quick-code-grid">
+        ${quicks.map(q => `
+          <button
+            type="button"
+            class="btn btn-soft btn-quick-code"
+            data-index="${idx}"
+            data-code="${esc(q.code)}"
+          >${esc(q.label)}</button>
+        `).join("")}
+      </div>
+    `;
+  }
+
+  function renderUnresolvedList(){
+    const list = document.getElementById("unresolvedList");
+    const count = state.unresolvedItems.length;
+
+    setText("unresolvedCountBadge", `${count} offen`);
+
+    if(!count){
+      setText("unresolvedHeadline", "Keine offenen Fälle.");
+      setText("unresolvedSubheadline", "Alle Datensätze konnten automatisch oder bereits manuell zugeordnet werden.");
+      list.innerHTML = `
+        <div class="empty-state">
+          <div class="fw-bold mb-2">Alles erledigt.</div>
+          <div>Du kannst jetzt direkt zu Schritt 4 wechseln und die CSV herunterladen.</div>
+        </div>
+      `;
+      document.getElementById("btnGoToStep4From3").disabled = false;
+      return;
+    }
+
+    setText("unresolvedHeadline", `${count} offene Zuordnung${count === 1 ? "" : "en"}`);
+    setText("unresolvedSubheadline", "Bitte für jeden offenen Datensatz ein VieTOUR-Ziel auswählen und speichern.");
+    document.getElementById("btnGoToStep4From3").disabled = true;
+
+    list.innerHTML = state.unresolvedItems.map((item, idx) => `
+      <div class="resolve-card">
+        <div class="resolve-head">
+          <div>
+            <div class="resolve-title">
+              Reservierung <span class="mono">${esc(item.reservationNumber)}</span>
+              ${item.fullName ? `· ${esc(item.fullName)}` : ""}
+            </div>
+            <div class="resolve-subline">
+              ${item.rawCountry ? `MEWS-Land: ${esc(item.rawCountry)}` : "Kein Landwert vorhanden"}
+            </div>
+          </div>
+          <div class="resolve-tags">
+            <span class="resolve-badge warn">Offen</span>
+            <span class="resolve-badge">${esc(item.type || "country")}</span>
+          </div>
+        </div>
+
+        <div class="resolve-grid">
+          <div class="resolve-info-grid">
+            <div class="resolve-field">
+              <span class="resolve-field-label">MEWS-Land</span>
+              <div class="resolve-field-value">${esc(item.rawCountry || "–")}</div>
+            </div>
+
+            <div class="resolve-field">
+              <span class="resolve-field-label">PLZ</span>
+              <div class="resolve-field-value">${esc(item.plz || "–")}</div>
+            </div>
+
+            <div class="resolve-field">
+              <span class="resolve-field-label">Reservierungsnummer</span>
+              <div class="resolve-field-value mono">${esc(item.reservationNumber || "–")}</div>
+            </div>
+
+            <div class="resolve-field">
+              <span class="resolve-field-label">Gast</span>
+              <div class="resolve-field-value">${esc(item.fullName || "–")}</div>
+            </div>
+
+            <div class="resolve-field wide">
+              <span class="resolve-field-label">Adresse</span>
+              <div class="resolve-field-value">${esc(item.address || "–")}</div>
+            </div>
+
+            <div class="resolve-field wide">
+              <span class="resolve-field-label">Grund</span>
+              <div class="resolve-field-value muted">${esc(item.reason || "Nicht auflösbar.")}</div>
+            </div>
+          </div>
+
+          <div class="resolve-actions">
+            <div class="action-block">
+              <label class="form-label">VieTOUR-Ziel</label>
+              <input
+                type="text"
+                class="form-control vietour-picker-input unresolved-target-input"
+                data-index="${idx}"
+                placeholder="Land / Ziel suchen..."
+                autocomplete="off"
+              />
+            </div>
+
+            <div class="action-block">
+              <label class="form-label">Schnellzuordnung</label>
+              ${getQuickCodeButtonsHtml(idx)}
+            </div>
+
+            <div class="action-block">
+              <label class="form-label">Speichern als</label>
+              <select class="form-select unresolved-scope" data-index="${idx}">
+                ${buildScopeOptions(item)}
+              </select>
+            </div>
+
+            <div class="action-block">
+              <button class="btn btn-accent" data-apply-unresolved="${idx}">
+                Zuordnung speichern
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `).join("");
+  }
+
+  function saveManualAssignment(item, code, scope){
+    if(!/^\d+$/.test(String(code || ""))){
+      throw new Error("Ungültiger VieTOUR-Code.");
+    }
+
+    if(scope === "postalDE"){
+      if(!item.plz) throw new Error("Keine DE-PLZ vorhanden.");
+      state.overrides.postalDE[item.plz] = String(code);
+    } else if(scope === "postalAT"){
+      if(!item.plz) throw new Error("Keine AT-PLZ vorhanden.");
+      state.overrides.postalAT[item.plz] = String(code);
+    } else if(scope === "country"){
+      const key = normCountry(item.rawCountry);
+      if(!key) throw new Error("Kein Landwert vorhanden.");
+      state.overrides.country[key] = { raw:item.rawCountry, code:String(code) };
+    } else {
+      const fp = rowFingerprint(item.rawCountry, item.address);
+      state.overrides.row[fp] = {
+        label:`${item.reservationNumber} | ${item.rawCountry} | ${item.address}`,
+        code:String(code)
+      };
+    }
+
+    saveOverrides();
+  }
+
+  function goToStep(step){
+    if(!state.ui.unlocked[step]) return;
+    state.ui.currentStep = step;
+    renderStepUi();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function renderStepUi(){
+    document.querySelectorAll(".step-section").forEach(section => section.classList.add("hidden"));
+    const activeSection = document.getElementById(`step${state.ui.currentStep}Section`);
+    if(activeSection) activeSection.classList.remove("hidden");
+
+    document.querySelectorAll("#stepper [data-step]").forEach(btn => {
+      const step = Number(btn.dataset.step);
+      btn.disabled = !state.ui.unlocked[step];
+      btn.classList.remove("active", "done");
+
+      if(step === state.ui.currentStep){
+        btn.classList.add("active");
+      } else {
+        const isDone =
+          (step === 1 && !!state.selectedFile) ||
+          (step === 2 && state.summary.rowsTotal > 0) ||
+          (step === 3 && state.summary.rowsTotal > 0 && state.summary.unresolvedCount === 0 && (state.ui.unlocked[3] || state.ui.unlocked[4])) ||
+          (step === 4 && state.summary.rowsTotal > 0 && state.summary.unresolvedCount === 0);
+
+        if(isDone) btn.classList.add("done");
+      }
+    });
+
+    updateStep2Actions();
+    updateFinalStep();
+  }
+
+  function updateStep2Actions(){
+    const btn3 = document.getElementById("btnGoToStep3");
+    const btn4 = document.getElementById("btnGoToStep4From2");
+
+    if(state.summary.rowsTotal === 0){
+      btn3.classList.add("hidden");
+      btn4.classList.add("hidden");
+      return;
+    }
+
+    if(state.unresolvedItems.length > 0){
+      btn3.classList.remove("hidden");
+      btn4.classList.add("hidden");
+    } else {
+      btn3.classList.add("hidden");
+      btn4.classList.remove("hidden");
+    }
+  }
+
+  function updateStep2Status(){
+    const badge = document.getElementById("step2StatusBadge");
+    const hint = document.getElementById("step2Hint");
+
+    if(state.summary.rowsTotal === 0){
+      badge.textContent = "Warte auf Auswertung";
+      hint.textContent = "Bitte zuerst in Schritt 1 eine Datei auswerten.";
+      return;
+    }
+
+    if(state.unresolvedItems.length > 0){
+      badge.textContent = `${state.unresolvedItems.length} offene Zuordnungen`;
+      hint.textContent = "Es gibt noch Datensätze, die manuell zugeordnet werden müssen.";
+    } else {
+      badge.textContent = "Bereit für Download";
+      hint.textContent = "Alle Datensätze konnten erfolgreich aufgelöst werden.";
+    }
+  }
+
+  function updateFinalStep(){
+    const repVal = document.getElementById("reportMonth").value || "";
+    const filename = repVal ? repVal.replace("-", ".") + "_statistik.csv" : "–";
+
+    setText("finalFilename", filename);
+    setText("finalArrivals", String(state.summary.arrivals || 0));
+    setText("finalNights", String(state.summary.nights || 0));
+    setText("finalCsvLines", String(state.summary.csvLines || 0));
+    setText("finalUnresolved", String(state.summary.unresolvedCount || 0));
+
+    const btn = document.getElementById("btnDownload");
+
+    if(!state.csvText.trim()){
+      setText("finalStatusText", "Noch keine auswertbare Datei vorhanden.");
+      setText("finalStatusHint", "Bitte zuerst Schritt 1 ausführen.");
+      btn.disabled = true;
+      return;
+    }
+
+    if(state.unresolvedItems.length > 0){
+      setText("finalStatusText", "Download noch gesperrt.");
+      setText("finalStatusHint", "Bitte zuerst alle offenen Zuordnungen in Schritt 3 abschließen.");
+      btn.disabled = true;
+      return;
+    }
+
+    setText("finalStatusText", "Die CSV ist fertig und kann heruntergeladen werden.");
+    setText("finalStatusHint", "Es sind keine offenen Zuordnungen mehr vorhanden.");
+    btn.disabled = false;
+  }
+
+  function processData(){
+    clearAlerts();
+    const previousStep = state.ui.currentStep;
+
+    state.protocol = [];
+    renderProtocol();
+    resetSummary();
+    renderUnresolvedList();
+    renderCsv("");
+    setText("summaryTotals", "Auswertung läuft …");
+    updateSummaryCards();
+    updateStep2Status();
+
+    if(!state.selectedFile){
+      addAlert("danger", "Keine Datei ausgewählt.");
+      addLog("error", "Auswertung abgebrochen: keine Datei ausgewählt.");
+      return;
+    }
+
+    saveSettings();
+
+    readFileAsRows(state.selectedFile)
+      .then(({ rows, sheetName }) => {
+        addLog("info", `Tabellenblatt geladen: ${sheetName}`);
+
+        const header = rows[0] || [];
+        state.columns = detectColumns(header);
+
+        const missing = REQUIRED_COLUMN_KEYS.filter(k => state.columns[k] === undefined);
+        if(missing.length){
+          throw new Error("Fehlende Pflichtspalten: " + missing.join(", "));
+        }
+
+        addLog("success", "Header erkannt.", state.columns);
+
+        state.rows = rows.slice(1);
+        state.summary.rowsTotal = state.rows.length;
+
+        const repVal = document.getElementById("reportMonth").value;
+        const repY = parseInt(repVal.split("-")[0], 10);
+        const repM = parseInt(repVal.split("-")[1], 10);
+        const repStart = getMonthStart(repY, repM);
+        const repEnd = getMonthEnd(repY, repM);
+
+        const aggregator = new Map();
+        const unresolved = [];
+
+        for(const row of state.rows){
+          if(!Array.isArray(row)){
+            state.summary.rowsSkipped++;
+            continue;
+          }
+
+          const reservationNumber = String(getCell(row, "number") || "").trim();
+          if(!reservationNumber){
+            state.summary.rowsSkipped++;
+            continue;
+          }
+
+          if(isCancelledRow(row)){
+            state.summary.rowsCancelled++;
+            continue;
+          }
+
+          const address = String(getCell(row, "address") || "").trim();
+          const rawCountry = extractCountryFromRow(row);
+          const arrDate = convertExcelDate(getCell(row, "arrival"));
+          const depDate = convertExcelDate(getCell(row, "departure"));
+          const persons = parseInt(getCell(row, "persons"), 10) || 0;
+          const firstname = String(getCell(row, "firstname") || "").trim();
+          const lastname = String(getCell(row, "lastname") || "").trim();
+          const fullName = `${firstname} ${lastname}`.trim();
+
+          if(!arrDate || !depDate || persons <= 0){
+            state.summary.rowsSkipped++;
+            continue;
+          }
+
+          const nights = calcNightsInMonth(arrDate, depDate, repStart, repEnd);
+          if(nights <= 0){
+            state.summary.rowsSkipped++;
+            continue;
+          }
+
+          const resolved = resolveCountryCode(rawCountry, address);
+
+          if(!resolved.ok){
+            unresolved.push({
+              reservationNumber,
+              fullName,
+              rawCountry,
+              address,
+              reason: resolved.reason || "Nicht auflösbar.",
+              type: resolved.type || "country",
+              plz: resolved.plz || (
+                resolved.type === "de" ? extractPlzDE(address) :
+                resolved.type === "at" ? extractPlzAT(address) : ""
+              ),
+              candidates: resolved.candidates || []
+            });
+            continue;
+          }
+
+          let finalPersons = 0;
+          if(arrDate >= repStart && arrDate < repEnd){
+            finalPersons = persons;
+          }
+
+          const bedNights = nights * persons;
+          const code = String(resolved.code);
+
+          if(!aggregator.has(code)){
+            aggregator.set(code, {
+              persons: 0,
+              nights: 0,
+              baseLand: resolved.exportLand || targetLabel(code),
+              rawCountries: new Set()
+            });
+          }
+
+          const entry = aggregator.get(code);
+          entry.persons += finalPersons;
+          entry.nights += bedNights;
+          if(rawCountry) entry.rawCountries.add(rawCountry);
+
+          if(EXPORT_LABELS_BY_CODE[code]){
+            entry.baseLand = EXPORT_LABELS_BY_CODE[code];
+          }
+
+          state.summary.rowsProcessed++;
+          state.summary.arrivals += finalPersons;
+          state.summary.nights += bedNights;
+        }
+
+        state.unresolvedItems = unresolved;
+        state.summary.unresolvedCount = unresolved.length;
+
+        const sortedEntries = [...aggregator.entries()].sort((a,b) => Number(a[0]) - Number(b[0]));
+
+        const lines = ["Code;Land;SummeAnkuenfte;SummeNaechtigungen"];
+        let totalArrivals = 0;
+        let totalNights = 0;
+
+        for(const [code, val] of sortedEntries){
+          const landLabel = buildDisplayLandForCode(code, val.baseLand, val.rawCountries);
+          lines.push(`${code};${landLabel};${val.persons};${val.nights}`);
+          totalArrivals += val.persons;
+          totalNights += val.nights;
+        }
+
+        state.summary.csvLines = lines.length - 1;
+        state.summary.arrivals = totalArrivals;
+        state.summary.nights = totalNights;
+
+        renderCsv(lines.join("\n"));
+        renderUnresolvedList();
+        renderOverrideTable();
+        updateSummaryCards();
+
+        document.getElementById("summaryTotals").textContent =
+          `Gesamtsumme Ankünfte: ${totalArrivals} | Gesamtsumme Nächtigungen: ${totalNights}`;
+
+        updateStep2Status();
+
+        state.ui.unlocked[2] = true;
+        state.ui.unlocked[3] = unresolved.length > 0;
+        state.ui.unlocked[4] = unresolved.length === 0;
+
+        if(previousStep === 3 && unresolved.length === 0){
+          state.ui.currentStep = 4;
+        } else {
+          state.ui.currentStep = 2;
+        }
+
+        renderStepUi();
+
+        if(unresolved.length){
+          addAlert("warning", `${unresolved.length} Datensätze konnten noch nicht eindeutig zugeordnet werden. Bitte in Schritt 3 bearbeiten.`);
+          addLog("warn", `${unresolved.length} ungelöste Datensätze gefunden.`, {
+            sample: unresolved.slice(0,5).map(x => ({
+              reservationNumber: x.reservationNumber,
+              guest: x.fullName,
+              rawCountry: x.rawCountry,
+              reason: x.reason
+            }))
+          });
+        } else {
+          addAlert("success", "Auswertung erfolgreich abgeschlossen. Die CSV ist bereit für den Download.");
+          addLog("success", "Auswertung erfolgreich abgeschlossen.", {
+            processed: state.summary.rowsProcessed,
+            arrivals: totalArrivals,
+            nights: totalNights
+          });
+        }
+      })
+      .catch(err => {
+        addAlert("danger", err.message || String(err));
+        addLog("error", "Fehler bei der Verarbeitung.", { message: err.message || String(err) });
+
+        renderCsv("");
+        state.unresolvedItems = [];
+        renderUnresolvedList();
+        resetSummary();
+        updateSummaryCards();
+        setText("summaryTotals", "Auswertung fehlgeschlagen.");
+        updateStep2Status();
+
+        state.ui.unlocked[2] = false;
+        state.ui.unlocked[3] = false;
+        state.ui.unlocked[4] = false;
+        state.ui.currentStep = 1;
+        renderStepUi();
+      });
+  }
+
+  function exportCsv(){
+    if(!state.csvText.trim()){
+      addAlert("danger", "Keine CSV-Daten vorhanden.");
+      addLog("error", "CSV-Download abgebrochen: keine Daten vorhanden.");
+      return;
+    }
+
+    if(state.unresolvedItems.length){
+      addAlert("warning", "Download blockiert: Es gibt noch ungelöste Zuordnungen.");
+      addLog("warn", "CSV-Download blockiert: ungelöste Zuordnungen vorhanden.");
+      return;
+    }
+
+    const repVal = document.getElementById("reportMonth").value;
+    const filename = repVal.replace("-", ".") + "_statistik.csv";
+    const blob = new Blob(["\uFEFF" + state.csvText], { type:"text/csv;charset=utf-8;" });
+
+    downloadBlob(blob, filename);
+    addLog("success", `CSV exportiert: ${filename}`);
+  }
+
+  function exportOverridesJson(){
+    const blob = new Blob([JSON.stringify(state.overrides, null, 2)], { type:"application/json;charset=utf-8" });
+    downloadBlob(blob, "mapping-overrides.json");
+    addLog("success", "Overrides exportiert.");
+  }
+
+  function importOverridesJson(file){
+    file.text().then(txt => {
+      const parsed = JSON.parse(txt);
+      if(!parsed || typeof parsed !== "object") throw new Error("Ungültige Mapping-Datei.");
+
+      state.overrides = {
+        country: parsed.country || {},
+        postalDE: parsed.postalDE || {},
+        postalAT: parsed.postalAT || {},
+        row: parsed.row || {}
+      };
+
+      saveOverrides();
+      addLog("success", "Overrides importiert.");
+
+      if(state.selectedFile) processData();
+    }).catch(err => {
+      addAlert("danger", err.message || String(err));
+      addLog("error", "Import der Overrides fehlgeschlagen.", { message: err.message || String(err) });
+    });
+  }
+
+  function handleSelectedFile(file){
+    state.selectedFile = file || null;
+    document.getElementById("dropzoneLabel").textContent = file ? file.name : "Datei hierher ziehen oder klicken";
+    document.getElementById("btnProcess").disabled = !file;
+
+    if(file){
+      addLog("info", `Datei ausgewählt: ${file.name}`);
+    }
+  }
+
+  function bindDropzone(){
+    const dz = document.getElementById("dropzone");
+    const input = document.getElementById("excelFile");
+
+    dz.addEventListener("click", () => input.click());
+    dz.addEventListener("keydown", e => {
+      if(e.key === "Enter" || e.key === " "){
+        e.preventDefault();
+        input.click();
+      }
+    });
+
+    ["dragenter","dragover"].forEach(evt => {
+      dz.addEventListener(evt, e => {
+        e.preventDefault();
+        dz.classList.add("is-dragover");
+      });
+    });
+
+    ["dragleave","drop"].forEach(evt => {
+      dz.addEventListener(evt, e => {
+        e.preventDefault();
+        dz.classList.remove("is-dragover");
+      });
+    });
+
+    dz.addEventListener("drop", e => {
+      const file = e.dataTransfer.files && e.dataTransfer.files[0];
+      if(file) handleSelectedFile(file);
+    });
+
+    input.addEventListener("change", e => {
+      const file = e.target.files && e.target.files[0];
+      if(file) handleSelectedFile(file);
+    });
+  }
+
+  function bindUi(){
+    document.getElementById("btnProcess").addEventListener("click", processData);
+    document.getElementById("btnDownload").addEventListener("click", exportCsv);
+
+    document.getElementById("reportMonth").addEventListener("change", saveSettings);
+    document.getElementById("countrySource").addEventListener("change", () => {
+      saveSettings();
+      if(state.selectedFile && state.ui.unlocked[2]) processData();
+    });
+
+    document.getElementById("btnBackToStep1").addEventListener("click", () => goToStep(1));
+    document.getElementById("btnReprocess").addEventListener("click", processData);
+    document.getElementById("btnGoToStep3").addEventListener("click", () => goToStep(3));
+    document.getElementById("btnGoToStep4From2").addEventListener("click", () => goToStep(4));
+    document.getElementById("btnBackToStep2").addEventListener("click", () => goToStep(2));
+    document.getElementById("btnGoToStep4From3").addEventListener("click", () => goToStep(4));
+    document.getElementById("btnBackToReview").addEventListener("click", () => goToStep(2));
+
+    document.querySelectorAll("#stepper [data-step]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const step = Number(btn.dataset.step);
+        goToStep(step);
+      });
+    });
+
+    document.getElementById("btnSaveCountryOverride").addEventListener("click", () => {
+      try{
+        const raw = document.getElementById("overrideCountryInput").value.trim();
+        const input = document.getElementById("overrideTargetSearch");
+        const code = input.dataset.selectedCode || "";
+
+        if(!raw) throw new Error("Bitte einen Mews-Landwert eingeben.");
+        if(!code) throw new Error("Bitte ein VieTOUR-Ziel auswählen.");
+
+        state.overrides.country[normCountry(raw)] = { raw, code };
+        saveOverrides();
+
+        document.getElementById("overrideCountryInput").value = "";
+        input.value = "";
+        input.dataset.selectedCode = "";
+
+        addAlert("success", `Länder-Override gespeichert: ${raw} → ${targetLabel(code)}`);
+        addLog("success", `Länder-Override gespeichert: ${raw} → ${code}`);
+
+        if(state.selectedFile && state.ui.unlocked[2]) processData();
+      }catch(err){
+        addAlert("danger", err.message || String(err));
+        addLog("error", err.message || String(err));
+      }
+    });
+
+    document.getElementById("btnExportOverrides").addEventListener("click", exportOverridesJson);
+    document.getElementById("btnImportOverrides").addEventListener("click", () => {
+      document.getElementById("mappingImportFile").click();
+    });
+
+    document.getElementById("mappingImportFile").addEventListener("change", e => {
+      const file = e.target.files && e.target.files[0];
+      if(file) importOverridesJson(file);
+      e.target.value = "";
+    });
+
+    document.getElementById("btnResetOverrides").addEventListener("click", () => {
+      if(!confirm("Alle Overrides wirklich löschen?")) return;
+      state.overrides = { country:{}, postalDE:{}, postalAT:{}, row:{} };
+      saveOverrides();
+      addLog("warn", "Alle Overrides gelöscht.");
+      if(state.selectedFile && state.ui.unlocked[2]) processData();
+    });
+
+    document.querySelector("#overrideTable tbody").addEventListener("click", e => {
+      const btn = e.target.closest("[data-remove-bucket]");
+      if(!btn) return;
+
+      const bucket = btn.getAttribute("data-remove-bucket");
+      const key = btn.getAttribute("data-remove-key");
+
+      if(state.overrides[bucket]){
+        delete state.overrides[bucket][key];
+        saveOverrides();
+        addLog("warn", `Override entfernt: ${bucket} → ${key}`);
+        if(state.selectedFile && state.ui.unlocked[2]) processData();
+      }
+    });
+
+    document.getElementById("unresolvedList").addEventListener("click", e => {
+      const quickBtn = e.target.closest(".btn-quick-code");
+      if(quickBtn){
+        const idx = Number(quickBtn.dataset.index);
+        const code = String(quickBtn.dataset.code || "");
+        const input = document.querySelector(`.unresolved-target-input[data-index="${idx}"]`);
+        if(input && code){
+          input.dataset.selectedCode = code;
+          input.value = targetLabel(code);
+        }
+        return;
+      }
+
+      const btn = e.target.closest("[data-apply-unresolved]");
+      if(!btn) return;
+
+      const idx = Number(btn.dataset.applyUnresolved);
+      const item = state.unresolvedItems[idx];
+      if(!item) return;
+
+      const input = document.querySelector(`.unresolved-target-input[data-index="${idx}"]`);
+      const scopeSel = document.querySelector(`.unresolved-scope[data-index="${idx}"]`);
+      const code = input ? (input.dataset.selectedCode || "") : "";
+      const scope = scopeSel ? scopeSel.value : "row";
+
+      try{
+        saveManualAssignment(item, code, scope);
+        addAlert("success", `Zuordnung gespeichert für Reservierung ${item.reservationNumber}. CSV wird neu berechnet.`);
+        addLog("success", "Manuelle Zuordnung gespeichert.", {
+          reservationNumber: item.reservationNumber,
+          rawCountry: item.rawCountry,
+          scope,
+          code
+        });
+
+        if(state.selectedFile) processData();
+      }catch(err){
+        addAlert("danger", err.message || String(err));
+        addLog("error", err.message || String(err));
+      }
+    });
+  }
+
+  function buildMonthOptions(){
+    const sel = document.getElementById("reportMonth");
+    if(!sel) return;
+
+    sel.innerHTML = "";
+
+    const now = new Date();
+    const baseYear = now.getFullYear();
+    const baseMonth = now.getMonth() + 1;
+
+    function formatYM(year, month){
+      return `${year}-${String(month).padStart(2, "0")}`;
+    }
+
+    for(let offset = -18; offset <= 2; offset++){
+      let y = baseYear;
+      let m = baseMonth + offset;
+
+      while(m < 1){ m += 12; y--; }
+      while(m > 12){ m -= 12; y++; }
+
+      const val = formatYM(y, m);
+      const opt = document.createElement("option");
+      opt.value = val;
+      opt.textContent = val;
+      sel.appendChild(opt);
+    }
+
+    let defaultYear = baseYear;
+    let defaultMonth = baseMonth - 1;
+    if(defaultMonth < 1){
+      defaultMonth = 12;
+      defaultYear--;
+    }
+
+    sel.value = formatYM(defaultYear, defaultMonth);
+  }
+
+  function init(){
+    buildMonthOptions();
+    loadSettings();
+    loadOverrides();
+    buildTargetOptions();
+    renderOverrideTable();
+    renderUnresolvedList();
+    renderProtocol();
+    updateSummaryCards();
+    updateStep2Status();
+    updateFinalStep();
+    bindDropzone();
+    bindUi();
+    bindFloatingPicker();
+    renderCsv("");
+    renderStepUi();
+    setText("summaryTotals", "Noch keine Auswertung vorhanden.");
+    addLog("info", "Tool initialisiert.");
+  }
+
+  document.addEventListener("DOMContentLoaded", init);
+})();
+</script>
+</body>
+</html>
